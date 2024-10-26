@@ -1,6 +1,6 @@
 # Pico Mac LCD
 
-v0.2 27 August 2024
+v0.1 26 October 2024
 
 Fork of https://github.com/evansm7/pico-mac v0.2
 Work in progress. Attempt to add support for display output to a TFT via SPI+RGB565 to the ST7701S
