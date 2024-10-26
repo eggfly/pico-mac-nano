@@ -4,8 +4,7 @@ v0.1 26 October 2024
 
 Fork of https://github.com/evansm7/pico-mac v0.2
 
-Work in progress. Attempt to add support for output to a TFT via SPI+RGB565 to the ST7701S
-
+Work in progress. Attempt to add support for output to a TFT via SPI+RGB565 to the ST7701S. 
 3-wire SPI used to initialise the ST7701S for RGB565 input.
 
 # Pico Micro Mac (pico-umac)
