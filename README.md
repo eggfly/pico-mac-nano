@@ -1,7 +1,15 @@
-# Pico Micro Mac (pico-umac)
+# Pico Mac LCD
 
 v0.2 27 August 2024
 
+Fork of https://github.com/evansm7/pico-mac v0.2
+Work in progress. Attempt to add support for display output to a TFT via SPI+RGB565 to the ST7701S
+3-wire SPI used to initialise the ST7701S for RGB565 input.
+
+************************
+# Pico Micro Mac LCD (pico-umac)
+
+v0.2 27 August 2024
 
 This project embeds the [umac Mac 128K
 emulator](https://github.com/evansm7/umac) project into a Raspberry Pi
