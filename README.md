@@ -1,4 +1,4 @@
-# Pico Mac LCD
+# Pico Mac LCD RGB
 
 v0.1 26 October 2024
 
@@ -7,7 +7,7 @@ Work in progress. Attempt to add support for display output to a TFT via SPI+RGB
 3-wire SPI used to initialise the ST7701S for RGB565 input.
 
 ************************
-# Pico Micro Mac LCD (pico-umac)
+# Pico Micro Mac (pico-umac)
 
 v0.2 27 August 2024
 
