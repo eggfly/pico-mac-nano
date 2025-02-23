@@ -1,11 +1,13 @@
-# Pico Mac LCD RGB
+# Pico Mac Nano
 
-v0.1 26 October 2024
+v0.1 23 February 2025
 
 Fork of https://github.com/evansm7/pico-mac v0.2
 
-Work in progress. Attempt to add support for output to a TFT via SPI+RGB565 to the ST7701S. 
-3-wire SPI used to initialise the ST7701S for RGB565 input.
+Work in progress. Project to create a miniature functioning Macintosh running pico-mac on a Waveshare Pico Zero by adding support for output to a small TFT LCD panel. This involved selecting and testing the smallest suitably high resolution display I could locate at a reasonable price, updating the pico-mac source code to configure the LCD via SPI interface, output suitable image data and use the Zero's built in Neo-pixel, and then 3D modelling the original Macintosh case at a scale based on the LCD image dimensions. Internal connection of the LCD and micro-SD card module to the Pico Zero requires a custom PCB.
+As with the pico-mac project, pico-mac-nano is a proof of concept rather than being intended to be a full featured device. My aim was to see how small I could make it and this involved some compromises.
+
+Prototype PCB is being manufactured. All files will be uploaded once complete.
 
 # Pico Micro Mac (pico-umac)
 
