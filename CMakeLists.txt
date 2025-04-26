@@ -29,7 +29,11 @@ cmake_minimum_required(VERSION 3.13)
 # directory with cmake, e.g. "cmake .. -DOPTION=true":
 #
 
-option(USE_SD "Build in SD support" OFF)
+option(TFT_2P "Output to TFT" true)
+
+option(PICO_ZERO "Running on WaveShare Pico Zero" true) 
+
+option(USE_SD "Build in SD support" true)
 set(SD_TX 3 CACHE STRING "SD SPI TX pin")
 set(SD_RX 4 CACHE STRING "SD SPI RX pin")
 set(SD_SCK 2 CACHE STRING "SD SPI SCK pin")
@@ -84,16 +88,28 @@ if (USE_SD)
    add_compile_definitions(SD_TX=${SD_TX} SD_RX=${SD_RX} SD_SCK=${SD_SCK} SD_CS=${SD_CS} SD_MHZ=${SD_MHZ})
 endif()
 
+if (TFT_2P)
+   add_compile_definitions(TFT_2P=1)
+   set(EXTRA_TFT2P_SRC src/tft_2p.c)
+endif()
+
+if (PICO_ZERO)
+   add_compile_definitions(PICO_ZERO=1)
+   set(EXTRA_PICOZERO_SRC src/ws2812.c)
+endif()
+
 if (TARGET tinyusb_device)
   add_executable(firmware
     src/main.c
     src/video.c
     src/kbd.c
     src/hid.c
+    ${EXTRA_PICOZERO_SRC}
+    ${EXTRA_TFT2P_SRC}
     ${EXTRA_SD_SRC}
 
     ${UMAC_SOURCES}
-    )
+  )
 
   # The umac sources need to prepare Musashi (some sources are generated):
   add_custom_command(OUTPUT ${UMAC_MUSASHI_PATH}/m68kops.c
@@ -125,7 +141,10 @@ if (TARGET tinyusb_device)
     )
 
   pico_generate_pio_header(firmware ${CMAKE_CURRENT_LIST_DIR}/src/pio_video.pio)
-
+  # WS2812 Mod START
+  pico_generate_pio_header(firmware ${CMAKE_CURRENT_LIST_DIR}/src/ws2812.pio)
+  # WS2812 Mod END
+  
   pico_enable_stdio_uart(firmware 1)
 
   # Needed for UF2:

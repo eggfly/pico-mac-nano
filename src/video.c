@@ -1,6 +1,8 @@
 /* Video output:
  *
- * Using PIO[1], output the Mac 512x342 1BPP framebuffer to VGA/pins.  This is done
+ * NJG: Modified to use 480x342 frame buffer output across top of 480x640 portrait LCD.
+ * 
+ * Using PIO[1], output the Mac 480x342 1BPP framebuffer to VGA/pins.  This is done
  * directly from the Mac framebuffer (without having to reformat in an intermediate
  * buffer).  The video output is 640x480, with the visible pixel data centred with
  * borders:  for analog VGA this is easy, as it just means increasing the horizontal
@@ -35,6 +37,7 @@
 #include <stdio.h>
 #include <inttypes.h>
 #include <string.h>
+#include "pico/time.h"
 #include "hardware/clocks.h"
 #include "hardware/dma.h"
 #include "hardware/gpio.h"
@@ -50,32 +53,32 @@
  * make my VGA-HDMI adapter sample weird, and pixels crawl.  Fudge a little,
  * looks better:
  */
-#define VIDEO_PCLK_MULT         (2.5*2)
-#define VIDEO_HSW               96
-#define VIDEO_HBP               48
-#define VIDEO_HRES              640
-#define VIDEO_HFP               16
+#define VIDEO_PCLK_MULT         (2.5*2) /* Was (2.5*2) */
+#define VIDEO_HSW               2  /* Was 96 */
+#define VIDEO_HBP               63  /* Horizontal Back Porch */
+#define VIDEO_HRES              480 /* Hor Resolution. changed from 640 */
+#define VIDEO_HFP               32  /* Horizontal Front Porch */
 #define VIDEO_H_TOTAL_NOSYNC    (VIDEO_HBP + VIDEO_HRES + VIDEO_HFP)
 #define VIDEO_VSW               2
-#define VIDEO_VBP               33
-#define VIDEO_VRES              480
-#define VIDEO_VFP               10
+#define VIDEO_VBP               17  /* Vertical Back Porch. changed from 33 */
+#define VIDEO_VRES              640 /* Ver Resolution. changed from 480 */
+#define VIDEO_VFP               12  /* Vertical Front Porch */
 #define VIDEO_V_TOTAL           (VIDEO_VSW + VIDEO_VBP + VIDEO_VRES + VIDEO_VFP)
 /* The visible vertical span in the VGA output, [start, end) lines: */
 #define VIDEO_V_VIS_START       (VIDEO_VSW + VIDEO_VBP)
 #define VIDEO_V_VIS_END         (VIDEO_V_VIS_START + VIDEO_VRES)
 
-#define VIDEO_FB_HRES           512
+#define VIDEO_FB_HRES           512 /* changed from 512 */
 #define VIDEO_FB_VRES           342
 
 /* The lines at which the FB data is actively output: */
-#define VIDEO_FB_V_VIS_START    (VIDEO_V_VIS_START + ((VIDEO_VRES - VIDEO_FB_VRES)/2))
+#define VIDEO_FB_V_VIS_START    124      /* Was (VIDEO_V_VIS_START + ((VIDEO_VRES - VIDEO_FB_VRES)/2)) */
 #define VIDEO_FB_V_VIS_END      (VIDEO_FB_V_VIS_START + VIDEO_FB_VRES)
 
 /* Words of 1BPP pixel data per line; this dictates the length of the
  * video data DMA transfer:
  */
-#define VIDEO_VISIBLE_WPL       (VIDEO_FB_HRES / 32)
+#define VIDEO_VISIBLE_WPL       (VIDEO_FB_HRES / 32) /* Words per line?? */
 
 #if (VIDEO_HRES & 31)
 #error "VIDEO_HRES: must be a multiple of 32b!"
@@ -309,6 +312,8 @@ static void     video_init_dma()
  *
  * FIXME: Add an API to change the FB base after init live, e.g. for bank
  * switching.
+ * 
+ * NJG : Added call to lcd_init()
  */
 void    video_init(uint32_t *framebuffer)
 {

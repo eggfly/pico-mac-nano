@@ -52,6 +52,15 @@
 #include "hw_config.h"
 #endif
 
+#if PICO_ZERO
+#include "ws2812.h"
+#include "ws2812.pio.h"
+#endif
+
+#if TFT_2P
+#include "tft_2p.h"
+#endif
+
 ////////////////////////////////////////////////////////////////////////////////
 // Imports and data
 
@@ -72,15 +81,21 @@ static uint8_t umac_ram[RAM_SIZE];
 
 ////////////////////////////////////////////////////////////////////////////////
 
+
 static void     io_init()
 {
-        gpio_init(GPIO_LED_PIN);
-        gpio_set_dir(GPIO_LED_PIN, GPIO_OUT);
+#if PICO_ZERO
+                uint pio1_offset = pio_add_program(pio1, &ws2812_program);
+                ws2812_program_init(pio1, 0, pio1_offset, GPIO_LED_PIN, 800000, true); /* Use PIO 1 as Vidio is using PIO 0 */
+#else
+                gpio_init(GPIO_LED_PIN);
+                gpio_set_dir(GPIO_LED_PIN, GPIO_OUT);
+#endif
 }
 
 static void     poll_led_etc()
 {
-        static int led_on = 0;
+        static uint8_t led_on = 0;
         static absolute_time_t last = 0;
         absolute_time_t now = get_absolute_time();
 
@@ -88,7 +103,11 @@ static void     poll_led_etc()
                 last = now;
 
                 led_on ^= 1;
+#if PICO_ZERO
+                put_pixel_green(led_on); 
+#else
                 gpio_put(GPIO_LED_PIN, led_on);
+#endif
         }
 }
 
@@ -251,7 +270,13 @@ static void     core1_main()
         disc_setup(discs);
 
         umac_init(umac_ram, (void *)umac_rom, discs);
-        /* Video runs on core 1, i.e. IRQs/DMA are unaffected by
+
+ #if TFT_2P
+        printf("TFT init\n");
+        tft_init();
+#endif
+
+       /* Video runs on core 1, i.e. IRQs/DMA are unaffected by
          * core 0's USB activity.
          */
         video_init((uint32_t *)(umac_ram + umac_get_fb_offset()));
