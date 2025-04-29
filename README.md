@@ -11,7 +11,7 @@ Prototype PCB is being manufactured. All files will be uploaded once complete.
 
 # Pico Micro Mac (pico-umac)
 
-v0.2 27 August 2024
+v0.21 20 December 2024
 
 This project embeds the [umac Mac 128K
 emulator](https://github.com/evansm7/umac) project into a Raspberry Pi
@@ -27,6 +27,8 @@ It has features, many features, the best features:
      disc storage on an SPI-attached SD card
    * Mac 128K by default, or you can make use of more of the Pico's
      memory and run as a _Mac 208K_
+   * Since you now have more memory, you can splash out on more
+     screen real-estate, and use 640x480 resolution!
 
 Great features.  It even doesn't hang at random!  (Anymore.)
 
@@ -67,6 +69,15 @@ This is because `umac` is used to patch the ROM, and when using
 unsupported sizes between 128K and 512K the RAM size can't be probed
 automatically, so the size needs to be embedded.
 
+This is also the case for altering the video resolution, because the ROM
+must be patched for this.  Build `umac` with `DISP_WIDTH=640 DISP_HEIGHT=480`
+when you intend to use the `USE_VGA_RES` option.  For example:
+
+```
+cd external/umac
+make MEMSIZE=208 DISP_WIDTH=640 DISP_HEIGHT=480
+```
+
 ## Build pico-umac
 
 Do the initial Pico SDK `cmake` setup into an out-of-tree build dir,
@@ -79,7 +90,8 @@ mkdir build
 (cd build ; PICO_SDK_PATH=/path/to/sdk cmake .. <options>)
 ```
 
-Options are required if you want SD support, or more than the default 128K of memory:
+Options are required if you want SD support, more than the default 128K of memory,
+higher resolution, to change pin configs, etc.:
 
    * `-DUSE_SD=true`: Include SD card support.  The GPIOs default to
      `spi0` running at 5MHz, and GPIOs 2,3,4,5 for
@@ -100,6 +112,13 @@ Options are required if you want SD support, or more than the default 128K of me
         writeable boot volume on SD) will allow _MacPaint_ to run.
       - **NOTE**: When this option is used, the ROM image must be
           built with an `umac` build with a corresponding `MEMSIZE`
+   * `-DUSE_VGA_RES=1`: Use 640x480 screen resolution instead of the
+     native 512x342.  This uses an additional 16KB of RAM, so this
+     option makes a _Mac 128K_ configuration virtually unusable.
+     It is recommended only to use this when configuring >208K
+     using the option above.
+   * `-DVIDEO_PIN=<GPIO pin>`: Move the video output pins; defaults
+     to the pinout shown below.
 
 Tip: `cmake` caches these variables, so if you see weird behaviour
 having built previously and then changed an option, delete the `build`
@@ -118,9 +137,10 @@ post-patching binary out:
 ```
 
 Note: Again, remember that if you are using the `-DMEMSIZE` option to
-increase the `pico-umac` memory, you will need to create this ROM
-image with a `umac` built with the corresponding `MEMSIZE` option, as
-above.
+increase the `pico-umac` memory, or the `-DUSE_VGA_RES` option to
+increase the `pico-umac` screen resolution, you will need to create
+this ROM image with a `umac` built with the corresponding
+`MEMSIZE`/`DISP_WIDTH`/`DISP_HEIGHT` options, as above.
 
 ## Disc image
 
@@ -228,12 +248,18 @@ board with 2MB+ flash as long as all required GPIOs are pinned out:
 | ------------ | ------------ | -------------- |
 |   GP0        | 1            | UART0 TX       |
 |   GP1        | 2            | UART0 RX       |
-|   GP18       | 24           | Video output   |
+|   GP18       | 24           | Video output % |
 |   GP19       | 25           | VSYNC          |
 |   GP21       | 27           | HSYNC          |
 |   Gnd        | 23, 28       | Video ground   |
 |   VBUS (5V)  | 40           | +5V supply     |
 |   Gnd        | 38           | Supply ground  |
+
+%: The video pins default here, but can be moved by building with the
+   `-DVIDEO_PIN` option.  This sets the position of the Video pin,
+   which is immediately followed by VSYNC, then a gap, then HSYNC.
+   For example, `-DVIDEO_PIN=20` configures the Video pin at 20,
+   VSYNC at 21, HSYNC at 23.
 
 Method:
 
