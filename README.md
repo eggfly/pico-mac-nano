@@ -1,5 +1,7 @@
 # pico-mac-nano
 
+<img alt="pico-mac-nano" src="https://github.com/user-attachments/assets/5b1be959-36a9-44cd-a6f1-652e655c3235" height="160px" /><img alt="big brother" src="https://github.com/user-attachments/assets/53f04e85-f4c4-42e8-bdb0-ae4d853ce238" height="160px" /><img alt="inside" src="https://github.com/user-attachments/assets/92f52392-7c24-46c8-81e2-6b47628ced43" height="160px" />
+
 v0.2 23 April 2025
 
 Fork of https://github.com/evansm7/pico-mac v0.21
@@ -30,7 +32,7 @@ The PCB directory contains all gerber, drill hole, position and BOM files for th
 
 The 3D_model directory contains the .stl files for the three components of the Macintosh 128K case (front housing, rear housing and reset/boot select button actuator).
 
-All parts used in pico-mac-nano can be ordered on [1bitrainbow.com](https://www.1bitrainbow.com/parts-store.php?cPath=972_973). This includes the 3D printed case, the fully assembled custom PCB and the Pico Zero (pre-flashed with the latest pico-mac-nano firmware). You can even order a fully assembled pico-mac-nano or the collectors edition so you can be as hands-on or hands-off as you want to the building of
+All parts used in pico-mac-nano can be ordered on [1bitrainbow.com](https://www.1bitrainbow.com/parts-store.php?cPath=972_973). This includes the 3D printed case, the fully assembled custom PCB and the Pico Zero (pre-flashed with the latest pico-mac-nano firmware). You can even order a fully assembled pico-mac-nano or the collectors edition so you can be as hands-on or hands-off as you want.
 
 Below is a modified version of [evansm7](https://github.com/evansm7) original readme from pico-mac v0.21 minus the Hardware Construction section since this variant uses a custom PCB so there is no construction to be done.
 
