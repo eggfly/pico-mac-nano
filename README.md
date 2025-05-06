@@ -30,13 +30,15 @@ The firmware directory contains an example, pre-built .uf2 rp2040 firmware file 
 
 The PCB directory contains all gerber, drill hole, position and BOM files for the most recent revision of the PCB.
 
+Data sheets for the TFT module and the controller are in the data_sheets directory.
+
 The 3D_model directory contains the .stl files for the three components of the Macintosh 128K case (front housing, rear housing and reset/boot select button actuator).
 
 All parts used in pico-mac-nano can be ordered on [1bitrainbow.com](https://www.1bitrainbow.com/parts-store.php?cPath=972_973). This includes the 3D printed case, the fully assembled custom PCB and the Pico Zero (pre-flashed with the latest pico-mac-nano firmware). You can even order a fully assembled pico-mac-nano or the collectors edition so you can be as hands-on or hands-off as you want.
 
 ## Hardware Notes
 
-The code, PCB and Macintosh case are all designed for the 2.0" 480x640px DX7 D200N2409V0 LCD panel. This uses the ST7701S controller and is configured via SPI. Data sheets for the TFT module and the controller are in the data_sheets directory.
+The code, PCB and Macintosh case are all designed for the 2.0" 480x640px DX7 D200N2409V0 LCD panel. This uses the ST7701S controller and is configured via SPI.
 
 The case and internal layout is designed to allow the Pico Zero and SD module to be connected via 2.54mm header sockets rather than being soldered on. Due to the small size of the PCB, I chose not to include sockets for the unused Pico Zero pins. Not having these unnecessary through-hole pins allowed routing of traces more efficiently. Consequently, the Pico Zero connects to the PCB via a 9-pin (J3), a 2-pin (J4), and a 4-pin (J6) socket.
 
