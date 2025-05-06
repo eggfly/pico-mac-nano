@@ -27,22 +27,18 @@
 #ifndef HW_H
 #define HW_H
 
-#if PICO_ZERO
-#define GPIO_LED_PIN    16  /* Use build-in ws2812 */
-#else
-#define GPIO_LED_PIN    PICO_DEFAULT_LED_PIN 
-#endif
-
+#if PICO_ZERO /* Pin defs for Waveshare Pico Zero board */
+#define GPIO_LED_PIN    16  /* Use Pico Zero's build-in ws2812 RGB neo-pixel */
 #define GPIO_VID_DATA   26
 #define GPIO_VID_VS     27
 #define GPIO_VID_CLK    28
 #define GPIO_VID_HS     29
-
-#define TFT_SPI_CS      13  /* TFT SPI Chip Select gpio */
-#define TFT_SPI_CLK     10  /* TFT SPI Clock gpio */
-#define TFT_SPI_MOSI    11  /* TFT SPI data TX gpio */
-#define TFT_SPI_PAUSE   1   /* TFT SPI ms between pin state changes */
-#define TFT_RESET       15  /* TFT Panel reset gpio */
-/* #define TFT_LED         14  /* TFT activity LED - for testing */
+#else /* Default RP Pico pins */
+#define GPIO_LED_PIN    PICO_DEFAULT_LED_PIN 
+#define GPIO_VID_DATA   18
+#define GPIO_VID_VS     19
+#define GPIO_VID_CLK    20
+#define GPIO_VID_HS     21
+#endif
 
 #endif

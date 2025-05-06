@@ -1,18 +1,95 @@
-# Pico Mac Nano
+# pico-mac-nano
 
-v0.1 23 February 2025
+v0.2 23 April 2025
 
-Fork of https://github.com/evansm7/pico-mac v0.2
+Fork of https://github.com/evansm7/pico-mac v0.21
 
-Work in progress. Project to create a miniature functioning Macintosh running pico-mac on a Waveshare Pico Zero by adding support for output to a small TFT LCD panel. This involved selecting and testing the smallest suitably high resolution display I could locate at a reasonable price, updating the pico-mac source code to configure the LCD via SPI interface, output suitable image data and use the Zero's built in Neo-pixel, and then 3D modelling the original Macintosh case at a scale based on the LCD image dimensions. Internal connection of the LCD and micro-SD card module to the Pico Zero requires a custom PCB.
-As with the pico-mac project, pico-mac-nano is a proof of concept rather than being intended to be a full featured device. My aim was to see how small I could make it and this involved some compromises.
+The purpose of this fork is the creation of a miniature functioning Macintosh running pico-mac on a Waveshare Pico Zero by adding support for output to a small TFT LCD panel. 
 
-Prototype PCB is being manufactured. All files will be uploaded once complete.
+This involved the following steps:
+   * Selecting and testing the smallest suitably high resolution display I could locate at
+     a reasonable price.
+   * Working backwards from LCD image size to calculate scale of the Macintosh model.
+   * Designing the internal layout of the Macintosh to accomodate all components.
+   * 3D modelling the Macintosh case in two halves with internal supports for components
+   * Designing a PCB to connect all components.
+   * Updating the pico-mac source code to ...
+   	 - configure the LCD via SPI interface shared with SD card module
+   	 - output suitable 480x342 pixel image data for the LCD
+   	 - use the Pico Zero's built in Neo-pixel RGB LED
+   	 - output out of phase 600Hz square waves on two GPIOs for 1s at startup to simulate
+   	  the Macintosh startup beep
 
-# Pico Micro Mac (pico-umac)
+The finished Macintosh is just 62mm high but houses a 2.0" TFT LCD panel, rp2040 Pico Zero mcu, micro-SD card reader and the custom PCB.
 
-v0.2 27 August 2024
+For more details on the journey and design decisions, see the [pico-mac-nano project page](https://blog.1bitrainbow.com/pico-mac-nano/).
 
+The firmware directory contains an example, pre-built .uf2 rp2040 firmware file for the Pico Zero. This version is built with the standard 128K ram.
+
+The PCB directory contains all gerber, drill hole, position and BOM files for the most recent revision of the PCB.
+
+The 3D_model directory contains the .stl files for the three components of the Macintosh 128K case (front housing, rear housing and reset/boot select button actuator).
+
+All parts used in pico-mac-nano can be ordered on [1bitrainbow.com](https://www.1bitrainbow.com/parts-store.php?cPath=972_973). This includes the 3D printed case, the fully assembled custom PCB and the Pico Zero (pre-flashed with the latest pico-mac-nano firmware). You can even order a fully assembled pico-mac-nano or the collectors edition so you can be as hands-on or hands-off as you want to the building of
+
+Below is a modified version of [evansm7](https://github.com/evansm7) original readme from pico-mac v0.21 minus the Hardware Construction section since this variant uses a custom PCB so there is no construction to be done.
+
+##Hardware Notes
+
+The code, PCB and Macintosh case are all designed for the 2.0" 480x640px DX7 D200N2409V0 LCD panel. This uses the ST7701S controller and is configured via SPI. Data sheets for the TFT module and the controller are in the data_sheets directory.
+
+The case and internal layout is designed to allow the Pico Zero and SD module to be connected via 2.54mm header sockets rather than being soldered on. Due to the small size of the PCB, I chose not to include sockets for the unused Pico Zero pins. Not having these unnecessary through-hole pins allowed routing of traces more efficiently. Consequently, the Pico Zero connects to the PCB via a 9-pin (J3), a 2-pin (J4), and a 4-pin (J6) socket.
+
+The PCB includes the capacitors (C1 & C2) recommended by evansm7 across the micro-SD card module power rails.
+
+The Pico 5V (VCC) is used to power the TFT backlight via a resistor (R1) which maintains the correct forward voltage specified by the TFT data sheet.
+
+The 40-pin, vertical FFC socket (J1) is used to connect the TFT LCD panel. Note that for some reason, the LCD flex cable has its 'pin' numbers labelled in the reverse order to the FCC socket. This is why the PCB indicates where the LCD flex pin 1 should be.
+
+Labelled test pads are provided on the PCB for all data signals.
+
+Provision for battery power is provided by the PCB in the form of +5v and Ground header pins. This 5v input passes through an on-board Schottky diode (D1) to protect against pico-mac-nano being connected to a USB host and receiving 5V via USB while using battery power.
+I plan to make a battery power module available on [1bitrainbow.com](https://www.1bitrainbow.com/parts-store.php?cPath=972_973) soon.
+
+All components should be mounted on the underside of the PCB with the exception of the 5v battery power and Audio header pins which should be mounted on the top to allow connection of a power source and/or speaker.
+
+For reference, here are the pin assignments for the Pico Zero.
+
+**Pin	Ref			Function**
+1		5V			VCC (TFT Backlight)
+2		GND			Ground
+3		3V3			VDD
+4		GPIO 29		H-Sync
+5		GPIO 28		Pix Clk
+6		GPIO 27		V-Sync
+7		GPIO 26		Vid Data
+8		GPIO 15		TFT Reset
+9		GPIO 14		TFT SPI CS
+10		GPIO 13		N/C
+11		GPIO 12		N/C
+12		GPIO 11		Audio +
+13		GPIO 10		Audio -
+14		GPIO 9		N/C
+15		GPIO 8		N/C
+16		GPIO 7		N/C
+17		GPIO 6		N/C
+18		GPIO 5		SD SPI CS
+19		GPIO 4		SPI MISO (shared)
+20		GPIO 3		SPI MOSI (shared)
+21		GPIO 2		SPI Clk (shared)
+22		GPIO 1		N/C
+23		GPIO 0		N/C
+
+The Audio + and Audio - pins output a 600Hz square wave for 1 second at the start of the initialisation code to give an approximate rendition of the original Macintosh startup beep. Audio - is the inverse of (180 deg out of sync with) Audio +. By connecting a speaker between this pair of outputs, we get a 6.6v differential signal which gave an acceptable volume without the need for any amplification. When the speaker was just connected between one output and ground, the volume was too low to be of use.
+Audio + and Audio - are presented on their own header pins on the PCB to allow a speaker to be easily connected.
+Using a suitable inductor (the value will depend on the impedance of the speaker you are using) in series with the speaker will filter out some of the higher frequencies so the beep is less buzzy.
+
+As with the pico-mac project, pico-mac-nano is a proof of concept rather than a full featured device. My aim was to see how small I could make it and this involved some compromises.
+
+Disclaimer: This project is provided with zero warranty. All due care has been taken in design/docs, but if you choose to build it then I disclaim any responsibility for your hardware or personal safety.
+
+
+# Pico Micro Mac (pico-umac) v0.2
 This project embeds the [umac Mac 128K
 emulator](https://github.com/evansm7/umac) project into a Raspberry Pi
 Pico microcontroller.  At long last, the worst Macintosh in a cheap,
@@ -20,7 +97,7 @@ portable form factor!
 
 It has features, many features, the best features:
 
-   * Outputs VGA 640x480@60Hz, monochrome, using three resistors
+   * Outputs 480x342px at 60Hz, monochrome to 2.0" LCD 
    * USB HID keyboard and mouse
    * Read-only disc image in flash (your creations are ephemeral, like life itself)
    * Or, if you have a hard time letting go, support for rewritable
@@ -36,10 +113,7 @@ surprising amount of software runs on the 128K config, but if you need
 to run _MacPaint_ specifically then you'll need to build both SD
 storage in addition to the _Mac 208K_ config.
 
-So anyway, you can build this project yourself for less than the cost
-of a beer!  You'll need at least a RPi Pico board, a VGA monitor (or
-VGA-HDMI adapter), a USB mouse (and maybe a USB keyboard/hub), plus a
-couple of cheap components.
+To build this project yourself, you'll need at least a WaveShare Pico Zero or compatible board, a 3D printer, the 2.0" LCD panel, SPI micro-SD card module, interconnect PCB, USB mouse (and maybe a USB keyboard/hub), plus a suitable OTG USB splitter.
 
 # Build
 
@@ -51,8 +125,13 @@ couple of cheap components.
 
 ## Build umac
 
-Install and build `umac` first.  It'll give you a preview of the fun
-to come, plus is required to generate a patched ROM image.
+Install and build `umac` first using the display width and height options. 
+It'll give you a preview of the fun to come, plus is required to generate a patched ROM image.
+
+```
+cd external/umac
+make DISP_WIDTH=480 DISP_HEIGHT=342
+```
 
 If you want to use a non-default memory size (i.e. >128K) you will
 need to build `umac` with a matching `MEMSIZE` build parameter, for
@@ -60,7 +139,7 @@ example:
 
 ```
 cd external/umac
-make MEMSIZE=208
+make DISP_WIDTH=480 DISP_HEIGHT=342 MEMSIZE=208
 ```
 
 This is because `umac` is used to patch the ROM, and when using
@@ -79,17 +158,8 @@ mkdir build
 (cd build ; PICO_SDK_PATH=/path/to/sdk cmake .. <options>)
 ```
 
-Options are required if you want SD support, or more than the default 128K of memory:
-
-   * `-DUSE_SD=true`: Include SD card support.  The GPIOs default to
-     `spi0` running at 5MHz, and GPIOs 2,3,4,5 for
-     `SCK`/`TX`/`RX`/`CS` respectively.  These can be overridden for
-     your board/setup:
-      - `-DSD_TX=<gpio pin>`
-      - `-DSD_RX=<gpio pin>`
-      - `-DSD_SCK=<gpio pin>`
-      - `-DSD_CS=<gpio pin>`
-      - `-DSD_MHZ=<integer speed in MHz>`
+If you want more than the default 128K of memory, you need to build with the following option.
+ 
    * `-DMEMSIZE=<size in KB>`: The maximum practical size is about
      208KB, but values between 128 and 208 should work on a RP2040.
      Note that although apps and Mac OS seem to gracefully detect free
@@ -100,6 +170,8 @@ Options are required if you want SD support, or more than the default 128K of me
         writeable boot volume on SD) will allow _MacPaint_ to run.
       - **NOTE**: When this option is used, the ROM image must be
           built with an `umac` build with a corresponding `MEMSIZE`
+
+**NOTE** All other options available in pico-mac are still recognised but are not listed here because the LCD and custom PCB used in pico-mac-nano require them to be set to specific values. Overriding the default for any option but DMEMSIZE will cause problems.
 
 Tip: `cmake` caches these variables, so if you see weird behaviour
 having built previously and then changed an option, delete the `build`
@@ -124,10 +196,9 @@ above.
 
 ## Disc image
 
-If you don't build SD support, an internal read-only disc image is
-stored in flash.  If you do build SD support, you have the option to
-still include an image in flash, and this is used as a fallback if
-SD boot fails.
+Micro-SD support is enabled by default. An internal read-only disc image is
+still stored in flash by default which is used as a fallback if
+no SD card is present, no valid boot image exists on the SD card, or the SD boot fails.
 
 Grab a Macintosh system disc from somewhere.  A 400K or 800K floppy
 image works just fine, up to System 3.2 (the last version to support
@@ -141,7 +212,7 @@ about 1.3MB is free there), or on the SD card.  (I don't know what the
 HFS limits are.  But if you make a 50MB disc you're unlikely to fill
 it with software that actually works on the _Mac 128K_ :) )
 
-If using an SD card, use a FAT-formatted card and copy your disc image
+Use a FAT-formatted micro-SD card and copy your disc image
 into _one_ of the following files in the root of the card:
 
    * `umac0.img`:  A normal read/write disc image
@@ -155,123 +226,15 @@ flash, you can now generate includes from them and perform the build:
 ```
 mkdir incbin
 xxd -i < rom.bin > incbin/umac-rom.h
-
-# When using an internal disc image:
 xxd -i < disc.bin > incbin/umac-disc.h
-# OR, if using SD and if you do _not_ want an internal image:
-echo > incbin/umac-disc.h
-
 make -C build
 ```
 
 You'll get a `build/firmware.uf2` out the other end.  Flash this to
-your Pico: e.g. plug it in with button held/drag/drop.  (When
-iterating/testing during development, unplugging the OTG cable each
-time is a pain – I ended up moving to SWD probe programming.)
+your Pico Zero: e.g. plug it into your computer with the Boot Select button held down. This should cause the Pico Zero to appear as a removable volume. Drag and drop the formware file onto the volume. ([evansm7](https://github.com/evansm7) advocated using an SWD probe but due to design constraints, UART serial pins are not routed on the custom PCB)
 
-The LED should flash at about 2Hz once powered up.
+The RGB LED should light up blue while the audio beep is being played, rapidly flash red while the LCD is being configured and then steadily flash green at about 2Hz.
 
-# Hardware contruction
-
-It's a simple circuit in terms of having few components: just the
-Pico, with three series resistors and a VGA connection, and DC power.
-However, if you're not comfortable soldering then don't choose this as
-your first project: I don't want you to zap your mouse, keyboard,
-monitor, SD cards...
-
-Disclaimer: This is a hardware project with zero warranty.  All due
-care has been taken in design/docs, but if you choose to build it then
-I disclaim any responsibility for your hardware or personal safety.
-
-With that out of the way...
-
-## Theory of operation
-
-Three 3.3V GPIO pins are driven by PIO to give VSYNC, HSYNC, and video
-out signals.
-
-The syncs are in many similar projects driven directly from GPIO, but
-here I suggest a 66Ω series resistor on each in order to keep the
-voltages at the VGA end (presumably into 75Ω termination?) in the
-correct range.
-
-For the video output, one GPIO drives R,G,B channels for mono/white
-output.  A 100Ω resistor gives roughly 0.7V (max intensity) into 3*75Ω
-signals.
-
-That's it... power in, USB adapter.
-
-## Pinout and circuit
-
-Parts needed:
-
-   * Pico/RP2040 board
-   * USB OTG micro-B to A adapter
-   * USB keyboard, mouse (and hub, if not integrated)
-   * 5V DC supply (600mA+), and maybe a DC jack
-   * 100Ω resistor
-   * 2x 66Ω resistors
-   * VGA DB15 connector, or janky chopped VGA cable
-   * (optional) SD card breakout, SD card
-
-If you want to get fancy with an SD card, you will need some kind of
-SD card SPI breakout adapter.  (There are a lot of these around, but
-many seem to have a buffer/level-converter for 5V operation.  Find one
-without, or modify your adapter for a 3.3V supply.  Doing so, and
-finding an SD card that works well with SPI is out of scope of this
-doc.)
-
-Pins are given for a RPi Pico board, but this will work on any RP2040
-board with 2MB+ flash as long as all required GPIOs are pinned out:
-
-| GPIO/pin     | Pico pin     | Usage          |
-| ------------ | ------------ | -------------- |
-|   GP0        | 1            | UART0 TX       |
-|   GP1        | 2            | UART0 RX       |
-|   GP18       | 24           | Video output   |
-|   GP19       | 25           | VSYNC          |
-|   GP21       | 27           | HSYNC          |
-|   Gnd        | 23, 28       | Video ground   |
-|   VBUS (5V)  | 40           | +5V supply     |
-|   Gnd        | 38           | Supply ground  |
-
-Method:
-
-   * Wire 5V supply to VBUS/Gnd
-   * Video output --> 100Ω --> VGA RGB (pins 1,2,3) all connected together
-   * HSYNC --> 66Ω --> VGA pin 13
-   * VSYNC --> 66Ω --> VGA pin 14
-   * Video ground --> VGA grounds (pins 5-8, 10)
-
-If you don't have exactly 100Ω, using slightly more is OK but display
-will be dimmer.  If you don't have 66Ω for the syncs, connecting them
-directly is "probably OK", but YMMV.
-
-If you are including an SD card, the default pinout is as follows
-(this can be changed at build time, above):
-
-| GPIO/pin     | Pico pin     | Usage          |
-| ------------ | ------------ | -------------- |
-|   GP2        | 4            | SPI0 SCK       |
-|   GP3        | 5            | SPI0 TX (MOSI) |
-|   GP4        | 6            | SPI0 RX (MISO) |
-|   GP5        | 7            | SPI0 /CS       |
-
-(The SD card needs a good ground, e.g. Pico pin 8 nearby, and 3.3V
-supply from Pico pin 36.)
-
-If your SD breakout board is "raw", i.e. has no buffer or series
-resistors on-board, you may find adding a 66Ω resistor in series on
-all of the four signal lines will help.  Supply decoupling caps will
-also be important (e.g. 1uF+0.1uF) to keep the SD card happy.  _Keep
-SD card wiring short._ The default SPI clock (5MHz) is
-conservative/slow, but I suggest verifying the circuit/SD card works
-before increasing it.
-
-Test your connections: the key part is not getting over 0.7V into your
-VGA connector's signals, or shorting SD card pins.
-
-Connect USB mouse, and keyboard if you like, and power up.
 
 # Software
 

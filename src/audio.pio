@@ -1,0 +1,31 @@
+;
+; Generate startup beep using two pins. 
+; By making one the inverse of the other, we get a signal with a peak to peak differential of 6.6v instead of 3.3v
+;
+
+.program PIOBeep
+.side_set 1
+
+;Generate a square wave on a GPIO pin
+.wrap_target
+    set pins, 1     side 0      [3] ;Drive audio_pin high and audio_pin_inv low
+    set pins, 0     side 1      [3] ;Drive audio_pin low and audio_pin_inv high
+.wrap
+
+;Helper function
+
+%c-sdk{
+    static inline void PIOBeep_program_init(PIO pio, uint sm, uint offset, uint audio_pin, uint audio_pin_inv, float clk_div){
+        pio_gpio_init(pio, audio_pin); //Setup the function select for a GPIO to use output from the given PIO instance
+        pio_gpio_init(pio, audio_pin_inv); //Setup the function select for a GPIO to use output from the given PIO instance
+        pio_sm_set_consecutive_pindirs(pio, sm, audio_pin, 2, true /* out */); //Use a state machine to set the same pin direction for multiple consecutive pins for the PIO instance
+
+        pio_sm_config c = PIOBeep_program_get_default_config(offset); //Get default configurations for the PIO state machine
+        sm_config_set_set_pins(&c, audio_pin, 1); //Set the state machine configurations on the given pin
+        sm_config_set_sideset_pins(&c, audio_pin_inv);    
+        sm_config_set_clkdiv(&c, clk_div); //Set the state machine clock divider
+
+        pio_sm_init(pio, sm, offset, &c); //Resets the state machine to a consistent state, and configures it
+        pio_sm_set_enabled(pio, sm, true); //Enable or disable a PIO state machine
+    }
+%}

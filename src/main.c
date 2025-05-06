@@ -61,6 +61,10 @@
 #include "tft_2p.h"
 #endif
 
+#if BEEP
+#include "audio.h"
+#endif
+
 ////////////////////////////////////////////////////////////////////////////////
 // Imports and data
 
@@ -85,8 +89,10 @@ static uint8_t umac_ram[RAM_SIZE];
 static void     io_init()
 {
 #if PICO_ZERO
-                uint pio1_offset = pio_add_program(pio1, &ws2812_program);
-                ws2812_program_init(pio1, 0, pio1_offset, GPIO_LED_PIN, 800000, true); /* Use PIO 1 as Vidio is using PIO 0 */
+                PIO pio = pio1; /* Use PIO 1 as Vidio is using PIO 0 */
+                uint offset = pio_add_program(pio, &ws2812_program);
+                uint sm = pio_claim_unused_sm(pio, true); //Claim a free state machine on a PIO instance
+                ws2812_program_init(pio, sm, offset, GPIO_LED_PIN, 800000, true); /* 800000 is frequency */
 #else
                 gpio_init(GPIO_LED_PIN);
                 gpio_set_dir(GPIO_LED_PIN, GPIO_OUT);
@@ -271,11 +277,6 @@ static void     core1_main()
 
         umac_init(umac_ram, (void *)umac_rom, discs);
 
- #if TFT_2P
-        printf("TFT init\n");
-        tft_init();
-#endif
-
        /* Video runs on core 1, i.e. IRQs/DMA are unaffected by
          * core 0's USB activity.
          */
@@ -290,10 +291,20 @@ static void     core1_main()
 
 int     main()
 {
-        set_sys_clock_khz(250*1000, true);
+       set_sys_clock_khz(250*1000, true);
 
 	stdio_init_all();
-        io_init();
+        io_init(); /* Just sets up the LED */
+
+#if BEEP
+        printf("Output audio beep\n");
+        beep();
+#endif
+
+#if TFT_2P /* Need to initialise TFT before UMAC starts because SPI is shared between TFT and SD card */
+        printf("TFT init\n");
+        tft_init();
+#endif
 
         multicore_launch_core1(core1_main);
 

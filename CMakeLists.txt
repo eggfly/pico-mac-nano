@@ -29,8 +29,6 @@ cmake_minimum_required(VERSION 3.13)
 # directory with cmake, e.g. "cmake .. -DOPTION=true":
 #
 
-option(TFT_2P "Output to TFT" true)
-
 option(PICO_ZERO "Running on WaveShare Pico Zero" true) 
 
 option(USE_SD "Build in SD support" true)
@@ -39,6 +37,16 @@ set(SD_RX 4 CACHE STRING "SD SPI RX pin")
 set(SD_SCK 2 CACHE STRING "SD SPI SCK pin")
 set(SD_CS 5 CACHE STRING "SD SPI CS pin")
 set(SD_MHZ 5 CACHE STRING "SD SPI speed in MHz")
+
+option(TFT_2P "Output to TFT" true) # Control pin settings for 2-inch Portrait TFT
+set(TFT_SPI_MOSI 3 CACHE STRING "TFT SPI TX pin")
+set(TFT_SPI_CLK 2 CACHE STRING "TFT SPI SCK pin")
+set(TFT_SPI_CS 14 CACHE STRING "TFT SPI CS pin")
+set(TFT_RESET 15 CACHE STRING "TFT hard reset pin")
+
+option(BEEP "Generate startup Beep" true) 
+set(GPIO_AUDIO 10 CACHE STRING "Audio signal out pin")
+set(GPIO_AUDIO_INV 11 CACHE STRING "Inverse of audio signal out pin")
 
 # See below, -DMEMSIZE=<size in KB> will configure umac's memory size,
 # overriding defaults.
@@ -91,11 +99,18 @@ endif()
 if (TFT_2P)
    add_compile_definitions(TFT_2P=1)
    set(EXTRA_TFT2P_SRC src/tft_2p.c)
+   add_compile_definitions(TFT_SPI_MOSI=${TFT_SPI_MOSI} TFT_SPI_CLK=${TFT_SPI_CLK} TFT_SPI_CS=${TFT_SPI_CS} TFT_RESET=${TFT_RESET})
 endif()
 
 if (PICO_ZERO)
    add_compile_definitions(PICO_ZERO=1)
    set(EXTRA_PICOZERO_SRC src/ws2812.c)
+endif()
+
+if (BEEP)
+   add_compile_definitions(BEEP=1)
+   set(EXTRA_AUDIO_SRC src/audio.c)
+   add_compile_definitions(GPIO_AUDIO=${GPIO_AUDIO} GPIO_AUDIO_INV=${GPIO_AUDIO_INV})   
 endif()
 
 if (TARGET tinyusb_device)
@@ -104,6 +119,7 @@ if (TARGET tinyusb_device)
     src/video.c
     src/kbd.c
     src/hid.c
+    ${EXTRA_AUDIO_SRC}
     ${EXTRA_PICOZERO_SRC}
     ${EXTRA_TFT2P_SRC}
     ${EXTRA_SD_SRC}
@@ -141,9 +157,16 @@ if (TARGET tinyusb_device)
     )
 
   pico_generate_pio_header(firmware ${CMAKE_CURRENT_LIST_DIR}/src/pio_video.pio)
+
   # WS2812 Mod START
-  pico_generate_pio_header(firmware ${CMAKE_CURRENT_LIST_DIR}/src/ws2812.pio)
+  if (PICO_ZERO)
+    pico_generate_pio_header(firmware ${CMAKE_CURRENT_LIST_DIR}/src/ws2812.pio)
+  endif()
   # WS2812 Mod END
+
+  if (BEEP)
+    pico_generate_pio_header(firmware ${CMAKE_CURRENT_LIST_DIR}/src/audio.pio)
+  endif()
   
   pico_enable_stdio_uart(firmware 1)
 
@@ -153,4 +176,3 @@ if (TARGET tinyusb_device)
 elseif(PICO_ON_DEVICE)
    message(WARNING "not building firmware because TinyUSB submodule is not initialized in the SDK")
 endif()
-

@@ -25,7 +25,7 @@
 
 #ifndef TFT2P_H
 #define TFT2P_H
-
+#define TFT_SPI_PAUSE   100   /* TFT SPI microseconds between each pin state change */
 void tft_init();
 
 #endif
