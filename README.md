@@ -1,5 +1,6 @@
 # pico-mac-nano
 <img alt="big brother" src="https://github.com/user-attachments/assets/e0253b50-8a37-4ee0-8fd1-9b10563f365b" height="160px" /><img alt="pico-mac-nano" src="https://github.com/user-attachments/assets/5b1be959-36a9-44cd-a6f1-652e655c3235" height="160px" /><img alt="inside" src="https://github.com/user-attachments/assets/92f52392-7c24-46c8-81e2-6b47628ced43" height="160px" />
+
 v0.2 23 April 2025
 Fork of https://github.com/evansm7/pico-mac v0.21
 
