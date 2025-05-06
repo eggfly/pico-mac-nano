@@ -36,7 +36,7 @@ All parts used in pico-mac-nano can be ordered on [1bitrainbow.com](https://www.
 
 Below is a modified version of [evansm7](https://github.com/evansm7) original readme from pico-mac v0.21 minus the Hardware Construction section since this variant uses a custom PCB so there is no construction to be done.
 
-##Hardware Notes
+## Hardware Notes
 
 The code, PCB and Macintosh case are all designed for the 2.0" 480x640px DX7 D200N2409V0 LCD panel. This uses the ST7701S controller and is configured via SPI. Data sheets for the TFT module and the controller are in the data_sheets directory.
 
