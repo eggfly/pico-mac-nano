@@ -55,9 +55,10 @@ All components should be mounted on the underside of the PCB with the exception 
 
 For reference, here are the pin assignments for the Pico Zero.
 
-|**Pin	|Ref			|Function**|
-| --- | --- |
+|**Pin**|Ref|**Function**|
+| --- | --- | --- |
 |1		|5V			|VCC (TFT Backlight)|
+
 2		GND			Ground
 3		3V3			VDD
 4		GPIO 29		H-Sync
