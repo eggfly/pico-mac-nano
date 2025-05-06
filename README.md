@@ -34,8 +34,6 @@ The 3D_model directory contains the .stl files for the three components of the M
 
 All parts used in pico-mac-nano can be ordered on [1bitrainbow.com](https://www.1bitrainbow.com/parts-store.php?cPath=972_973). This includes the 3D printed case, the fully assembled custom PCB and the Pico Zero (pre-flashed with the latest pico-mac-nano firmware). You can even order a fully assembled pico-mac-nano or the collectors edition so you can be as hands-on or hands-off as you want.
 
-Below is a modified version of [evansm7](https://github.com/evansm7) original readme from pico-mac v0.21 minus the Hardware Construction section since this variant uses a custom PCB so there is no construction to be done.
-
 ## Hardware Notes
 
 The code, PCB and Macintosh case are all designed for the 2.0" 480x640px DX7 D200N2409V0 LCD panel. This uses the ST7701S controller and is configured via SPI. Data sheets for the TFT module and the controller are in the data_sheets directory.
@@ -90,6 +88,8 @@ Using a suitable inductor (the value will depend on the impedance of the speaker
 As with the pico-mac project, pico-mac-nano is a proof of concept rather than a full featured device. My aim was to see how small I could make it and this involved some compromises.
 
 Disclaimer: This project is provided with zero warranty. All due care has been taken in design/docs, but if you choose to build it then I disclaim any responsibility for your hardware or personal safety.
+
+Below is a modified version of [evansm7](https://github.com/evansm7) original readme from pico-mac v0.21 minus the Hardware Construction section since this variant uses a custom PCB so there is no construction to be done.
 
 
 # Pico Micro Mac (pico-umac) v0.2
