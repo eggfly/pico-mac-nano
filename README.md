@@ -58,29 +58,28 @@ For reference, here are the pin assignments for the Pico Zero.
 |**Pin**|Ref|**Function**|
 | --- | --- | --- |
 |1		|5V			|VCC (TFT Backlight)|
-
-2		GND			Ground
-3		3V3			VDD
-4		GPIO 29		H-Sync
-5		GPIO 28		Pix Clk
-6		GPIO 27		V-Sync
-7		GPIO 26		Vid Data
-8		GPIO 15		TFT Reset
-9		GPIO 14		TFT SPI CS
-10		GPIO 13		N/C
-11		GPIO 12		N/C
-12		GPIO 11		Audio +
-13		GPIO 10		Audio -
-14		GPIO 9		N/C
-15		GPIO 8		N/C
-16		GPIO 7		N/C
-17		GPIO 6		N/C
-18		GPIO 5		SD SPI CS
-19		GPIO 4		SPI MISO (shared)
-20		GPIO 3		SPI MOSI (shared)
-21		GPIO 2		SPI Clk (shared)
-22		GPIO 1		N/C
-23		GPIO 0		N/C
+|2		|GND		|Ground|
+|3		|3V3		|VDD|
+|4		|GPIO 29	|H-Sync|
+|5		|GPIO 28	|Pix Clk|
+|6		|GPIO 27	|V-Sync|
+|7		|GPIO 26	|Vid Data|
+|8		|GPIO 15	|TFT Reset|
+|9		|GPIO 14	|TFT SPI CS|
+|10		|GPIO 13	|N/C|
+|11		|GPIO 12	|N/C|
+|12		|GPIO 11	|Audio +|
+|13		|GPIO 10	|Audio -|
+|14		|GPIO 9		|N/C|
+|15		|GPIO 8		|N/C|
+|16		|GPIO 7		|N/C|
+|17		|GPIO 6		|N/C|
+|18		|GPIO 5		|SD SPI CS|
+|19		|GPIO 4		|SPI MISO (shared)|
+|20		|GPIO 3		|SPI MOSI (shared)|
+|21		|GPIO 2		|SPI Clk (shared)|
+|22		|GPIO 1		|N/C|
+|23		|GPIO 0		|N/C|
 
 The Audio + and Audio - pins output a 600Hz square wave for 1 second at the start of the initialisation code to give an approximate rendition of the original Macintosh startup beep. Audio - is the inverse of (180 deg out of sync with) Audio +. By connecting a speaker between this pair of outputs, we get a 6.6v differential signal which gave an acceptable volume without the need for any amplification. When the speaker was just connected between one output and ground, the volume was too low to be of use.
 Audio + and Audio - are presented on their own header pins on the PCB to allow a speaker to be easily connected.
