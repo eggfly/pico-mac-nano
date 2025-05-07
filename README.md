@@ -6,23 +6,23 @@ v0.2 23 April 2025
 
 Fork of https://github.com/evansm7/pico-mac v0.21
 
-The purpose of this fork is the creation of a miniature functioning Macintosh running pico-mac on a Waveshare Pico Zero by adding support for output to a small TFT LCD panel. 
+The purpose of this fork is the creation of a miniature functioning Macintosh running pico-mac on a [Waveshare Pico Zero](https://www.waveshare.com/wiki/RP2040-Zero) (or pin/function compatible RP2040 MCU) by adding support for output to a small TFT LCD panel. 
 
 This involved the following steps:
    * Selecting and testing the smallest suitably high resolution display I could locate at
      a reasonable price.
-   * Working backwards from LCD image size to calculate scale of the Macintosh model.
+   * Working backwards from the LCD image size to calculate scale of the Macintosh model.
    * Designing the internal layout of the Macintosh to accomodate all components.
    * 3D modelling the Macintosh case in two halves with internal supports for components
    * Designing a PCB to connect all components.
    * Updating the pico-mac source code to ...
    	 - configure the LCD via SPI interface shared with SD card module
-   	 - output suitable 480x342 pixel image data for the LCD
+   	 - output suitable 480x342 pixel frame buffer data for the LCD
    	 - use the Pico Zero's built in Neo-pixel RGB LED
    	 - output out of phase 600Hz square waves on two GPIOs for 1s at startup to simulate
    	  the Macintosh startup beep
 
-The finished Macintosh is just 62mm high but houses a 2.0" TFT LCD panel, rp2040 Pico Zero mcu, micro-SD card reader and the custom PCB.
+The finished Macintosh is just 62mm high but houses a 2.0" TFT LCD panel, rp2040 Pico Zero MCU, micro-SD card reader and the custom PCB.
 
 For more details on the journey and design decisions, see the [pico-mac-nano project page](https://blog.1bitrainbow.com/pico-mac-nano/).
 
@@ -38,7 +38,7 @@ All parts used in pico-mac-nano can be ordered on [1bitrainbow.com](https://www.
 
 ## Hardware Notes
 
-The code, PCB and Macintosh case are all designed for the 2.0" 480x640px DX7 D200N2409V0 LCD panel. This uses the ST7701S controller and is configured via SPI.
+The code, PCB and Macintosh case are all designed for the 2.0" 480x640px DX7 D200N2409V0 LCD panel. This uses the ST7701S controller, is configured via SPI and receives image data in RGB565 (16-bit colour). This LCD is natively portrait and ST7701S controller does not offer image rotation in hardware so I am displaying a 480x342 image across the upper half of the LCD panel. See the [pico-mac-nano project page](https://blog.1bitrainbow.com/pico-mac-nano/) for more details of my thought process.
 
 The case and internal layout is designed to allow the Pico Zero and SD module to be connected via 2.54mm header sockets rather than being soldered on. Due to the small size of the PCB, I chose not to include sockets for the unused Pico Zero pins. Not having these unnecessary through-hole pins allowed routing of traces more efficiently. Consequently, the Pico Zero connects to the PCB via a 9-pin (J3), a 2-pin (J4), and a 4-pin (J6) socket.
 
@@ -50,12 +50,12 @@ The 40-pin, vertical FFC socket (J1) is used to connect the TFT LCD panel. Note 
 
 Labelled test pads are provided on the PCB for all data signals.
 
-Provision for battery power is provided by the PCB in the form of +5v and Ground header pins. This 5v input passes through an on-board Schottky diode (D1) to protect against pico-mac-nano being connected to a USB host and receiving 5V via USB while using battery power.
+Provision for battery power is provided on the PCB in the form of +5v and Ground header pins. This 5v input passes through an on-board Schottky diode (D1) to protect against pico-mac-nano being connected to a USB host and receiving 5V via USB while using battery power.
 I plan to make a battery power module available on [1bitrainbow.com](https://www.1bitrainbow.com/parts-store.php?cPath=972_973) soon.
 
 All components should be mounted on the underside of the PCB with the exception of the 5v battery power and Audio header pins which should be mounted on the top to allow connection of a power source and/or speaker.
 
-For reference, here are the pin assignments for the Pico Zero.
+For reference, here are the pin assignments I have used for the Pico Zero.
 
 |**Pin**|Ref|**Function**|
 | --- | --- | --- |
@@ -87,12 +87,11 @@ The Audio + and Audio - pins output a 600Hz square wave for 1 second at the star
 Audio + and Audio - are presented on their own header pins on the PCB to allow a speaker to be easily connected.
 Using a suitable inductor (the value will depend on the impedance of the speaker you are using) in series with the speaker will filter out some of the higher frequencies so the beep is less buzzy.
 
-As with the pico-mac project, pico-mac-nano is a proof of concept rather than a full featured device. My aim was to see how small I could make it and this involved some compromises.
+As with the pico-mac project, pico-mac-nano is a personal hobby project and proof of concept rather than a full featured device. My aim was to see how small I could make it and this involved some compromises.
 
 Disclaimer: This project is provided with zero warranty. All due care has been taken in design/docs, but if you choose to build it then I disclaim any responsibility for your hardware or personal safety.
 
 Below is a modified version of [evansm7](https://github.com/evansm7) original readme from pico-mac v0.21 minus the Hardware Construction section since this variant uses a custom PCB so there is no construction to be done.
-
 
 # Pico Micro Mac (pico-umac) v0.2
 This project embeds the [umac Mac 128K
