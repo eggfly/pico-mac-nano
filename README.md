@@ -2,7 +2,7 @@
 
 <img alt="pico-mac-nano" src="https://github.com/user-attachments/assets/5b1be959-36a9-44cd-a6f1-652e655c3235" height="160px" /><img alt="big brother" src="https://github.com/user-attachments/assets/53f04e85-f4c4-42e8-bdb0-ae4d853ce238" height="160px" /><img alt="inside" src="https://github.com/user-attachments/assets/92f52392-7c24-46c8-81e2-6b47628ced43" height="160px" />
 
-v0.21 27 May 2025
+v0.3 20 May 2025
 
 Fork of https://github.com/evansm7/pico-mac v0.21
 
@@ -32,7 +32,7 @@ The PCB directory contains all gerber, drill hole, position and BOM files for th
 
 Data sheets for the TFT module and the controller are in the data_sheets directory.
 
-The 3D_model directory contains the .stl files for the three components of the Macintosh 128K case (front housing, rear housing and reset/boot select button actuator).
+The 3D_model directory contains the .stl files for the four components of the Macintosh 128K case; front housing, rear housing, switch blank (blocks the switch apperture intended for the upcoming [battery module](https://www.1bitrainbow.com/parts-store.php?cPath=972_973)) and reset/boot select button actuator.
 
 All parts used in pico-mac-nano can be ordered on [1bitrainbow.com](https://www.1bitrainbow.com/parts-store.php?cPath=972_973). This includes the 3D printed case, the fully assembled custom PCB and the Pico Zero (pre-flashed with the latest pico-mac-nano firmware). You can even order a fully assembled pico-mac-nano or the collectors edition so you can be as hands-on or hands-off as you want.
 
@@ -85,7 +85,7 @@ For reference, here are the pin assignments I have used for the Pico Zero.
 
 The Audio + and Audio - pins output a 600Hz square wave for 1 second at the start of the initialisation code to give an approximate rendition of the original Macintosh startup beep. Audio - is the inverse of (180 deg out of sync with) Audio +. By connecting a speaker between this pair of outputs, we get a 6.6v differential signal which gave an acceptable volume without the need for any amplification. When the speaker was just connected between one output and ground, the volume was too low to be of use.
 Audio + and Audio - are presented on their own header pins on the PCB to allow a speaker to be easily connected.
-Using a suitable inductor (the value will depend on the impedance of the speaker you are using) in series with the speaker will filter out some of the higher frequencies so the beep is less buzzy.
+Using a suitable inductor (the value will depend on the impedance of the speaker you are using) in series with the speaker, or a capacitor across the speaker, should filter out some of the higher frequencies so the beep is less buzzy.
 
 As with the pico-mac project, pico-mac-nano is a personal hobby project and proof of concept rather than a full featured device. My aim was to see how small I could make it and this involved some compromises.
 
