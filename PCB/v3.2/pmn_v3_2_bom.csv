@@ -1,0 +1,6 @@
+Comment,Designator,Footprint,JLCPCB Part #,
+1uf Tantalum 16v,C1,SMD 1206 (3216 metric),C7171,
+0.1uf MLCC 50v,C2,SMD 1206 (3216 metric),C24497,
+Schottky Diode 40v 1A,D1,SMD SOD-123,C8598,
+FFC2A32-40-T,J1,SMD 0.5-40PVertical welding,C11080,
+22ohms 250mW,R1,SMD 1206 (3216 metric),C17958,
