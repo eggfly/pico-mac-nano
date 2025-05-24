@@ -52,9 +52,11 @@ The 40-pin, vertical FFC socket (J1) is used to connect the TFT LCD panel. Note 
 Labelled test pads are provided on the PCB for all data signals.
 
 Provision for battery power is provided on the PCB in the form of +5v and Ground header pins. This 5v input passes through an on-board Schottky diode (D1) to protect against pico-mac-nano being connected to a USB host and receiving 5V via USB while using battery power.
-I plan to make a battery power module available on [1bitrainbow.com](https://www.1bitrainbow.com/parts-store.php?cPath=972_973) soon.
+The optional battery power module is available now on [1bitrainbow.com](https://www.1bitrainbow.com/parts-store.php?cPath=72_973_P4470).
 
-All components should be mounted on the underside of the PCB with the exception of the 5v battery power and Audio header pins which should be mounted on the top to allow connection of a power source and/or speaker.
+All components should be mounted on the underside of the PCB with the exception of the 2-pin 2.54mm male header (right-angle if using the [1-bit rainbow battery power module](https://www.1bitrainbow.com/parts-store.php?cPath=72_973_P4470)) for 5v battery power, and the 2-pin 2.54mm female header for Audio (Beep). These should be mounted on the top to allow connection of a power source and/or speaker.
+<img alt="pcb bottom" src="https://github.com/user-attachments/assets/2985da71-811d-4a72-b823-25e356b60896" height="320px" /><img alt="pcb top side" src="https://github.com/user-attachments/assets/69a76ac8-57c6-4426-9abd-42eba6f9679b" height="320px" />
+
 
 For reference, here are the pin assignments I have used for the Pico Zero.
 
