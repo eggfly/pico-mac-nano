@@ -69,10 +69,10 @@ For reference, here are the pin assignments I have used for the Pico Zero.
 |7		|GPIO 26	|Vid Data|
 |8		|GPIO 15	|TFT Reset|
 |9		|GPIO 14	|TFT SPI CS|
-|10		|GPIO 13	|N/C|
-|11		|GPIO 12	|N/C|
-|12		|GPIO 11	|Audio +|
-|13		|GPIO 10	|Audio -|
+|10		|GPIO 13	|Audio +|
+|11		|GPIO 12	|Audio -|
+|12		|GPIO 11	|N/C|
+|13		|GPIO 10	|N/C|
 |14		|GPIO 9		|N/C|
 |15		|GPIO 8		|N/C|
 |16		|GPIO 7		|N/C|
