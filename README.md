@@ -33,15 +33,15 @@ The PCB directory contains all gerber, drill hole, position and BOM files for th
 
 Data sheets for the TFT module and the controller are in the data_sheets directory.
 
-The 3D_model directory contains the .stl files for the four components of the Macintosh 128K case; front housing, rear housing, switch blank (blocks the switch apperture intended for the upcoming [battery module](https://www.1bitrainbow.com/parts-store.php?cPath=972_973)) and reset/boot select button actuator.
+The 3D_model directory contains the .stl files for the four components of the Macintosh 128K case; front housing, rear housing, switch blank (blocks the switch apperture intended for the [battery power module](https://www.1bitrainbow.com/parts-store.php?cPath=972_973_P4470)) and reset/boot select button actuator.
 
 All parts used in pico-mac-nano can be ordered on [1bitrainbow.com](https://www.1bitrainbow.com/parts-store.php?cPath=972_973). This includes the 3D printed case, the fully assembled custom PCB and the Pico Zero (pre-flashed with the latest pico-mac-nano firmware). You can even order a fully assembled pico-mac-nano or the collectors edition so you can be as hands-on or hands-off as you want.
 
 ## Hardware Notes
 
-The code, PCB and Macintosh case are all designed for the 2.0" 480x640px DX7 D200N2409V0 LCD panel. This uses the ST7701S controller, is configured via SPI and receives image data in RGB565 (16-bit colour). This LCD is natively portrait and ST7701S controller does not offer image rotation in hardware so I am displaying a 480x342 image across the upper half of the LCD panel. See the [pico-mac-nano project page](https://blog.1bitrainbow.com/pico-mac-nano/) for more details of my thought process.
+The pico code, PCB and Macintosh case are all designed for the 2.0" 480x640px DX7 D200N2409V0 LCD panel. This uses the ST7701S controller, is configured via SPI and receives image data in RGB565 (16-bit colour). This LCD is natively portrait and the ST7701S controller does not offer image rotation in hardware so I am displaying a 480x342 image across the upper half of the LCD panel. See the [pico-mac-nano project page](https://blog.1bitrainbow.com/pico-mac-nano/) for more details of how I got to this decision.
 
-The case and internal layout is designed to allow the Pico Zero and SD module to be connected via 2.54mm header sockets rather than being soldered on. Due to the small size of the PCB, I chose not to include sockets for the unused Pico Zero pins. Not having these unnecessary through-hole pins allowed routing of traces more efficiently. Consequently, the Pico Zero connects to the PCB via a 9-pin (J3), a 2-pin (J4), and a 4-pin (J6) socket.
+The case and internal layout is designed to allow the Pico Zero and SD module to be connected via 2.54mm header sockets rather than being soldered. Due to the small size of the PCB, I chose not to include sockets for the unused Pico Zero pins. Not having these unnecessary through-hole pins allowed routing of traces more efficiently. Consequently, the Pico Zero connects to the PCB via a 9-pin (J3), a 2-pin (J4), and a 4-pin (J6) socket.
 
 The PCB includes the capacitors (C1 & C2) recommended by evansm7 across the micro-SD card module power rails.
 
@@ -52,11 +52,12 @@ The 40-pin, vertical FFC socket (J1) is used to connect the TFT LCD panel. Note 
 Labelled test pads are provided on the PCB for all data signals.
 
 Provision for battery power is provided on the PCB in the form of +5v and Ground header pins. This 5v input passes through an on-board Schottky diode (D1) to protect against pico-mac-nano being connected to a USB host and receiving 5V via USB while using battery power.
-The optional battery power module is available now on [1bitrainbow.com](https://www.1bitrainbow.com/parts-store.php?cPath=72_973_P4470).
+The optional battery power module which uses a 3v lithium C2 battery, 5v boost regulator and micro switch, is available now on [1bitrainbow.com](https://www.1bitrainbow.com/parts-store.php?cPath=972_973_P4470).
 
-All components should be mounted on the underside of the PCB with the exception of the 2-pin 2.54mm male header (right-angle if using the [1-bit rainbow battery power module](https://www.1bitrainbow.com/parts-store.php?cPath=72_973_P4470)) for 5v battery power, and the 2-pin 2.54mm female header for Audio (Beep). These should be mounted on the top to allow connection of a power source and/or speaker.
-<img alt="pcb bottom" src="https://github.com/user-attachments/assets/2985da71-811d-4a72-b823-25e356b60896" height="320px" /><img alt="pcb top side" src="https://github.com/user-attachments/assets/69a76ac8-57c6-4426-9abd-42eba6f9679b" height="320px" />
+All components should be mounted on the underside of the PCB with the exception of the 2-pin 2.54mm male header (right-angle if using the [1-bit rainbow battery power module](https://www.1bitrainbow.com/parts-store.php?cPath=972_973_P4470)) for 5v battery power, and the 2-pin 2.54mm female header for Audio (Beep). These should be mounted on the top to allow connection of a power source and/or speaker.
 
+<img alt="pcb bottom" src="https://github.com/user-attachments/assets/2985da71-811d-4a72-b823-25e356b60896" height="320px" />
+<img alt="pcb top side" src="https://github.com/user-attachments/assets/69a76ac8-57c6-4426-9abd-42eba6f9679b" height="320px" />
 
 For reference, here are the pin assignments I have used for the Pico Zero.
 
@@ -86,15 +87,15 @@ For reference, here are the pin assignments I have used for the Pico Zero.
 |22		|GPIO 1		|N/C|
 |23		|GPIO 0		|N/C|
 
-The Audio + and Audio - pins output a 600Hz square wave for 1 second at the start of the initialisation code to give an approximate rendition of the original Macintosh startup beep. Audio - is the inverse of (180 deg out of sync with) Audio +. By connecting a speaker between this pair of outputs, we get a 6.6v differential signal which gave an acceptable volume without the need for any amplification. When the speaker was just connected between one output and ground, the volume was too low to be of use.
+The Audio + and Audio - pins output a 600Hz square wave for 1 second at the start of the initialisation code to give an approximate rendition of the original Macintosh startup beep. Audio - is just the inverse of (180 deg out of sync with) Audio +. By connecting a speaker between this pair of outputs, we get a 6.6v differential signal which gave an acceptable volume without the need for any amplification. When the speaker was just connected between one output and ground, the volume was too low to be of use (In case you're worrying, both pins are set low after the beep so the Pico is not left with a high GPIO shorting to ground through the speaker).
 Audio + and Audio - are presented on their own header pins on the PCB to allow a speaker to be easily connected.
 Using a suitable inductor (the value will depend on the impedance of the speaker you are using) in series with the speaker, or a capacitor across the speaker, should filter out some of the higher frequencies so the beep is less buzzy.
 
-As with the pico-mac project, pico-mac-nano is a personal hobby project and proof of concept rather than a full featured device. My aim was to see how small I could make it and this involved some compromises.
+As with the pico-mac project, pico-mac-nano is a personal hobby project and proof of concept rather than a commercial product. My aim was to see how small I could make it and this involved some compromises.
 
-Disclaimer: This project is provided with zero warranty. All due care has been taken in design/docs, but if you choose to build it then I disclaim any responsibility for your hardware or personal safety.
+Disclaimer: This project is provided with no warranty. All due care has been taken in design/docs, but if you choose to build it then I disclaim any responsibility for your hardware or personal safety.
 
-Below is a modified version of [evansm7](https://github.com/evansm7) original readme from pico-mac v0.21 minus the Hardware Construction section since this variant uses a custom PCB so there is no construction to be done.
+Below is a modified version of [evansm7](https://github.com/evansm7) original readme from pico-mac v0.21 minus the Hardware Construction section since this variant uses a custom PCB so there is none of the original construction to be done.
 
 # Pico Micro Mac (pico-umac) v0.2
 This project embeds the [umac Mac 128K
@@ -178,7 +179,7 @@ If you want more than the default 128K of memory, you need to build with the fol
       - **NOTE**: When this option is used, the ROM image must be
           built with an `umac` build with a corresponding `MEMSIZE`
 
-**NOTE** All other options available in pico-mac are still recognised but are not listed here because the LCD and custom PCB used in pico-mac-nano require them to be set to specific values. Overriding the default for any option but DMEMSIZE will cause problems.
+**NOTE** All other options available in pico-mac are still recognised but are not listed here because the LCD and custom PCB used in pico-mac-nano require them to be set to specific values. Overriding the default for any option other than DMEMSIZE will cause problems.
 
 Tip: `cmake` caches these variables, so if you see weird behaviour
 having built previously and then changed an option, delete the `build`
@@ -271,17 +272,17 @@ how in practice you might capture keypresses/deal with mouse events.
 
 The video system is pretty good and IMHO worth stealing for other
 projects: It uses one PIO state machine and 3 DMA channels to provide
-a rock-solid bitmapped 1BPP 640x480 video output.  The Mac 512x342
+a rock-solid bitmapped 1BPP 480x342 video output. ~~The Mac 512x342
 framebuffer is centred inside this by using horizontal blanking
 regions (programmed into the line scan-out) and vertical blanking
-areas from a dummy "always black" mini-framebuffer.
+areas from a dummy "always black" mini-framebuffer.~~
 
-It supports (at build time) flexible resolutions/timings.  The one
+~~It supports (at build time) flexible resolutions/timings.  The one
 caveat (or advantage?) is that it uses an HSYNC IRQ routine to
 recalculate the next DMA buffer pointer; doing this at scan-time costs
 about 1% of the CPU time (on core 1).  However, it could be used to
 generate video on-the-fly from characters/tiles without a true
-framebuffer.
+framebuffer.~~
 
 I'm considering improvements to the video system:
 
