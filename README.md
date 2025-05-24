@@ -1,5 +1,6 @@
 # pico-mac-nano
 
+<img alt="pico-mac-nano" src="https://github.com/user-attachments/assets/d9a80395-f821-47a4-9e62-aa7472d8036d" height="160px" />
 <img alt="pico-mac-nano" src="https://github.com/user-attachments/assets/5b1be959-36a9-44cd-a6f1-652e655c3235" height="160px" /><img alt="big brother" src="https://github.com/user-attachments/assets/53f04e85-f4c4-42e8-bdb0-ae4d853ce238" height="160px" /><img alt="inside" src="https://github.com/user-attachments/assets/92f52392-7c24-46c8-81e2-6b47628ced43" height="160px" />
 
 v0.3 20 May 2025
