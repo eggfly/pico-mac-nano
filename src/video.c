@@ -72,7 +72,7 @@
 #define VIDEO_FB_VRES           342
 
 /* The lines at which the FB data is actively output: */
-#define VIDEO_FB_V_VIS_START    124      /* Was (VIDEO_V_VIS_START + ((VIDEO_VRES - VIDEO_FB_VRES)/2)) */
+#define VIDEO_FB_V_VIS_START    118      /* Was (VIDEO_V_VIS_START + ((VIDEO_VRES - VIDEO_FB_VRES)/2)) */
 #define VIDEO_FB_V_VIS_END      (VIDEO_FB_V_VIS_START + VIDEO_FB_VRES)
 
 /* Words of 1BPP pixel data per line; this dictates the length of the
