@@ -38,9 +38,9 @@ uint8_t led_blue = 0;
 
 static  uint32_t urgb_u32(uint8_t r, uint8_t g, uint8_t b) {
   /* convert rgb flags to RGB values */
-  if (r == 1) r = 255;
-  if (g == 1) g = 255;
-  if (b == 1) b = 255;
+  if (r == 1) r = 2; // was 255
+  if (g == 1) g = 2; // was 255
+  if (b == 1) b = 2; // was 255
   return ((uint32_t)(r) << 8) | ((uint32_t)(g) << 16) | (uint32_t)(b);
 }
 

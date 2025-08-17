@@ -29,5 +29,6 @@
 #include <inttypes.h>
 
 void    video_init(uint32_t *framebuffer);
+void    draw_mac_icon(uint32_t *framebuffer, int start_x, int start_y);
 
 #endif

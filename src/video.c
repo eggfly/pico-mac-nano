@@ -45,7 +45,76 @@
 #include "pio_video.pio.h"
 
 #include "hw.h"
+#include "font.h"
 
+// 内存监控函数
+static void print_memory_usage() {
+    
+    printf("==================\n");
+}
+// 1bpp 24x31 image, 1=row major, black=1, white=0
+const uint8_t mac_icon[31*3] = {
+        0x3f, 0xff, 0xfc,
+        0x40, 0x00, 0x02,
+        0x80, 0x00, 0x01,
+        0x8f, 0xff, 0xf1,
+        0x90, 0x00, 0x09,
+        0x90, 0x00, 0x09,
+        0x90, 0x00, 0x09,
+        0x90, 0x89, 0x09,
+        0x90, 0x92, 0x09,
+        0x90, 0x92, 0x09,
+        0x90, 0x00, 0x09,
+        0x90, 0x00, 0x09,
+        0x90, 0x00, 0x09,
+        0x90, 0x00, 0x09,
+        0x90, 0x00, 0x09,
+        0x90, 0x00, 0x09,
+        0x90, 0x00, 0x09,
+        0x90, 0x00, 0x09,
+        0x90, 0x00, 0x09,
+        0x90, 0x00, 0x09,
+        0x90, 0x00, 0x09,
+        0x90, 0x00, 0x09,
+        0x90, 0x00, 0x09,
+        0x90, 0x00, 0x09,
+        0x90, 0x00, 0x09,
+        0x90, 0x00, 0x09,
+        0x90, 0x00, 0x09,
+        0x90, 0x00, 0x09,
+        0x50, 0x00, 0x0a,
+        0x4c, 0x00, 0x32,
+        0x43, 0xff, 0xc2
+    };
+
+// 使用 draw_pixel 函数绘制 mac_icon，通过行列循环保证字节序
+void draw_mac_icon(uint32_t *framebuffer, int start_x, int start_y) {
+    const int icon_width = 24;
+    const int icon_height = 31;
+    
+    // 遍历图标的每一行
+    for (int row = 0; row < icon_height; row++) {
+        // 计算当前行在 mac_icon 数组中的起始位置
+        int byte_offset = row * 3; // 每行3个字节
+        
+        // 遍历图标的每一列
+        for (int col = 0; col < icon_width; col++) {
+            // 计算当前像素在字节中的位置
+            int byte_index = col / 8;  // 0, 1, 2
+            int bit_index = 7 - (col % 8);  // 从高位到低位，7,6,5,4,3,2,1,0
+            
+            // 获取对应的字节
+            uint8_t pixel_byte = mac_icon[byte_offset + byte_index];
+            
+            // 提取像素值（1=黑色，0=白色）
+            bool is_black = (pixel_byte & (1 << bit_index)) != 0;
+            
+            // 使用 draw_pixel 函数绘制像素，保证字节序
+            draw_pixel(framebuffer, start_x + col, start_y + row, is_black);
+        }
+    }
+}
+    
 ////////////////////////////////////////////////////////////////////////////////
 /* VESA VGA mode 640x480@60 */
 
@@ -86,8 +155,9 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Video DMA, framebuffer pointers
+// 上面镂空 118, 下面高度180
+static uint32_t video_null[VIDEO_VISIBLE_WPL * 207]; // TODO: 这个尺寸不重要，且看是否超过了__HeapLimit
 
-static uint32_t video_null[VIDEO_VISIBLE_WPL];
 static uint32_t *video_framebuffer;
 
 /* DMA buffer containing 2 pairs of per-line config words, for VS and not-VS: */
@@ -125,8 +195,13 @@ static const uint32_t   *__not_in_flash_func(video_line_addr)(unsigned int y)
         int vy = video_get_visible_y(y);
         if (vy >= 0)
                 return (const uint32_t *)&video_framebuffer[vy * VIDEO_VISIBLE_WPL];
-        else
-                return (const uint32_t *)video_null;
+        else if (y<VIDEO_FB_V_VIS_START) {
+                // 减去 27 参数是正确的，减去越大，越靠上
+                return (const uint32_t *)&video_null[((signed int)y-27)*VIDEO_VISIBLE_WPL];
+        }
+        else {
+                return (const uint32_t *)&video_null[(y-VIDEO_FB_V_VIS_END)*VIDEO_VISIBLE_WPL];
+        }
 }
 
 static const uint32_t   *__not_in_flash_func(video_cfg_addr)(unsigned int y)
@@ -181,10 +256,72 @@ static void     __not_in_flash_func(video_dma_irq)()
         }
 }
 
-static void     video_prep_buffer()
+static void video_prep_buffer()
 {
-        memset(video_null, 0xff, VIDEO_VISIBLE_WPL * 4);
+        // 初始化video_null数组
+        memset(video_null, 0xff, sizeof(video_null));
 
+        // draw_string_8x8(video_null, 5, 10, "~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!~", 0);
+        // draw_string_8x8(video_null, 5, 20, "Hello World! Pico Mac Nano Project!", 0);
+        // draw_string_8x8(video_null, 5, 30, "--------- Macintosh System 1-6 since 1984 ---------", 0);
+        // 测试特殊字符显示
+        draw_string_8x8(video_null, 0, 0*8, "┌──────────────────────────────────────────────────────────┐", 0);
+        draw_string_8x8(video_null, 0, 1*8, "│  RETRO OS v3.1                                           │", 0);
+        draw_string_8x8(video_null, 0, 2*8, "│  (C) 1989-2025                                           │", 0);
+        draw_string_8x8(video_null, 0, 3*8, "│                                                          │", 0);
+        draw_string_8x8(video_null, 0, 4*8, "│  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓                                   │", 0);
+        draw_string_8x8(video_null, 0, 5*8, "│  Initializing devices... OK                              │", 0);
+        draw_string_8x8(video_null, 0, 6*8, "│  Mounting filesystem... OK                               │", 0);
+        draw_string_8x8(video_null, 0, 7*8, "│  Starting services...  OK                                │", 0);
+        draw_string_8x8(video_null, 0, 8*8, "│                                                          │", 0);
+        draw_string_8x8(video_null, 0, 9*8, "│  C:\\> _                                                  │", 0); // 这里多了是因为斜杠的转义
+        draw_string_8x8(video_null, 0, 10*8, "└──────────────────────────────────────────────────────────┘", 0);
+        // draw_string_6x8(video_null, 60, 40, "!", 0);
+        // draw_string_6x8(video_null, 60, 50, "P", 0);
+        // 上方 0-90 = 91 高度？
+        // 中间 342 高度
+        // 底部 207高度？
+        // 91+342+207 = 640
+        // 高度 480, y=0的横线
+        drawHLine(video_null, 0, 479, 0, false);
+        // 高度 480, y=1的横线
+        drawHLine(video_null, 0, 479, 1, false);
+        // 宽度 480, y=100的横线
+        drawHLine(video_null, 0, 479, 100, false);
+        // 宽度 480, y=116的横线
+        drawHLine(video_null, 0, 479, 80, false);
+        // 宽度 480, y=117的横线
+        drawHLine(video_null, 0, 479, 90, false);
+        // 宽度 480, y=179的横线
+        drawHLine(video_null, 0, 479, 179, false);
+        // 宽度 480, y=205的横线
+        drawHLine(video_null, 0, 479, 205, false);
+        // 宽度 480, y=206的横线
+        drawHLine(video_null, 0, 479, 206, false);
+        // 宽度 480, y=207的横线
+        drawHLine(video_null, 0, 479, 207, false);
+        // 高度 0-180，x=0 的竖线
+        drawVLine(video_null, 0, 0, 180, false);
+        // // 高度 0-118，x=200 的竖线
+        // drawVLine(video_null, 200, 0, 118, false);
+        // // 高度 118-179，x=200 的竖线
+        // drawVLine(video_null, 200, 118, 179, false);
+        // 高度 179-342，x=200 的竖线
+        drawVLine(video_null, 200, 179, 342, false);
+        // for (int y = 0; y < VIDEO_FB_V_VIS_START; y++) {
+        //         // x=200, 高度 118 的一个竖线
+        //         draw_pixel(video_null, 200, y, false);
+        // }
+        // for (int x = 0; x < 479; x++) {
+        //         // y=10的全宽度横线
+        //         draw_pixel(video_null, x, 10, false);
+        // }
+        // for (int x = 0; x < 479; x++) {
+        //         // y=179的全宽度横线
+        //         draw_pixel(video_null, x, 179, false);
+        // }
+        draw_mac_icon(video_null, 0, 0);
+        draw_string_8x8(video_null, 20, 80, "0123456789.9876543210", 0);
         unsigned int porch_padding = (VIDEO_HRES - VIDEO_FB_HRES)/2;
         // FIXME: HBP/HFP are prob off by one or so, check
         uint32_t timing = ((VIDEO_HSW - 1) << 23) |
@@ -318,6 +455,9 @@ static void     video_init_dma()
 void    video_init(uint32_t *framebuffer)
 {
         printf("Video init\n");
+        
+        // 打印内存使用情况
+        print_memory_usage();
 
         pio_video_program_init(pio0, 0,
                                pio_add_program(pio0, &pio_video_program),
@@ -347,4 +487,9 @@ void    video_init(uint32_t *framebuffer)
         /* Set up pointers to first line, and start DMA */
         video_dma_prep_new();
         dma_channel_start(video_dmach_descr_cfg);
+        
+        // // 在帧缓冲区上绘制一些测试文字
+        // draw_string_8x8(video_framebuffer, 10, 10, "Pico Mac Nano", 1);
+        // draw_string_6x8(video_framebuffer, 10, 30, "Video System Ready", 1);
+        // draw_string_6x8(video_framebuffer, 10, 50, "Font System: OK", 1);
 }

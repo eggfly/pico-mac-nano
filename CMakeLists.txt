@@ -85,7 +85,10 @@ set(UMAC_SOURCES
   )
 
 set(MEMSIZE 128 CACHE STRING "Memory size, in KB")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -DPICO -DMUSASHI_CNF=\\\"../include/m68kconf.h\\\" -DUMAC_MEMSIZE=${MEMSIZE}")
+set(DISP_WIDTH 512 CACHE STRING "Display width in pixels, here must be 512!!!")
+set(DISP_HEIGHT 342 CACHE STRING "Display height in pixels")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -DPICO -DMUSASHI_CNF=\\\"../include/m68kconf.h\\\" -DUMAC_MEMSIZE=${MEMSIZE} -DDISP_WIDTH=${DISP_WIDTH} -DDISP_HEIGHT=${DISP_HEIGHT}")
+add_compile_definitions(USE_SD=1)
 
 if (USE_SD)
    add_compile_definitions(USE_SD=1)
@@ -119,6 +122,8 @@ if (TARGET tinyusb_device)
     src/video.c
     src/kbd.c
     src/hid.c
+    src/font.c
+    src/font_test.c
     ${EXTRA_AUDIO_SRC}
     ${EXTRA_PICOZERO_SRC}
     ${EXTRA_TFT2P_SRC}
@@ -144,6 +149,7 @@ if (TARGET tinyusb_device)
     tinyusb_board
     hardware_dma
     hardware_pio
+    hardware_pwm
     hardware_sync
     ${EXTRA_SD_LIB}
     )

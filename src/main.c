@@ -33,6 +33,7 @@
 #include "hardware/gpio.h"
 #include "hardware/pio.h"
 #include "hardware/sync.h"
+#include "hardware/pwm.h"
 #include "pico/multicore.h"
 #include "pico/stdlib.h"
 #include "pico/time.h"
@@ -85,6 +86,42 @@ static uint8_t umac_ram[RAM_SIZE];
 
 ////////////////////////////////////////////////////////////////////////////////
 
+// PWM初始化函数
+static void init_pwm_outputs()
+{
+        // IO6 PWM配置
+        gpio_set_function(6, GPIO_FUNC_PWM);
+        uint slice_num_6 = pwm_gpio_to_slice_num(6);
+        uint chan_6 = pwm_gpio_to_channel(6);
+        
+        // 设置PWM频率为1kHz
+        pwm_set_clkdiv(slice_num_6, 125.0f); // 125MHz / 125 = 1MHz
+        pwm_set_wrap(slice_num_6, 9999); // 1MHz / 10000 = 100Hz，但可以设置更低占空比
+        pwm_set_chan_level(slice_num_6, chan_6, 1); // 0.01%占空比 (1/10000)
+        pwm_set_enabled(slice_num_6, true);
+        
+        printf("IO6 PWM initialized: 100Hz, 0.01%% duty cycle\n");
+        
+        // IO7 PWM配置检查
+        gpio_set_function(7, GPIO_FUNC_PWM);
+        uint slice_num_7 = pwm_gpio_to_slice_num(7);
+        uint chan_7 = pwm_gpio_to_channel(7);
+        
+        // 检查IO7是否可以配置为PWM
+        if (slice_num_7 != slice_num_6) {
+                // IO7使用不同的PWM slice，可以独立配置
+                pwm_set_clkdiv(slice_num_7, 125.0f);
+                pwm_set_wrap(slice_num_7, 999);
+                pwm_set_chan_level(slice_num_7, chan_7, 250); // 25%占空比作为测试
+                pwm_set_enabled(slice_num_7, true);
+                printf("IO7 PWM initialized: 1kHz, 25%% duty cycle\n");
+        } else {
+                // IO7与IO6共享同一个PWM slice，只能使用相同的频率
+                pwm_set_chan_level(slice_num_7, chan_7, 750); // 75%占空比
+                pwm_set_enabled(slice_num_7, true);
+                printf("IO7 PWM initialized: same frequency as IO6, 75%% duty cycle\n");
+        }
+}
 
 static void     io_init()
 {
@@ -163,6 +200,7 @@ static void     poll_umac()
         if (update) {
                 umac_mouse(dx, -dy, b);
         }
+        // handle_my_mouse(cursor_x, cursor_y, cursor_button);
 
         if (!kbd_queue_empty()) {
                 uint16_t k = kbd_queue_pop();
@@ -295,6 +333,9 @@ int     main()
 
 	stdio_init_all();
         io_init(); /* Just sets up the LED */
+        
+        // 初始化PWM功能
+        init_pwm_outputs();
 
 #if BEEP
         printf("Output audio beep\n");
