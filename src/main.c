@@ -66,6 +66,8 @@
 #include "audio.h"
 #endif
 
+extern hid_info_t g_hid_info;
+
 ////////////////////////////////////////////////////////////////////////////////
 // Imports and data
 
@@ -141,13 +143,44 @@ static void     poll_led_etc()
         static uint8_t led_on = 0;
         static absolute_time_t last = 0;
         absolute_time_t now = get_absolute_time();
-
+        bool hasKeyboard = false;
+        bool hasMouse = false;
+        for (int i = 0; i < CFG_TUH_HID; i++) {
+                if (g_hid_info.info[i].hid_type == 1) {
+                        if (!hasKeyboard) {
+                            hasKeyboard = true;
+                        }       
+                } else if (g_hid_info.info[i].hid_type == 2) {
+                        if (!hasMouse) {
+                            hasMouse = true;
+                        }
+                }
+        }
+        // Mouse exist led color green, keyboard exist led color blue
+        uint8_t red = 0;
+        uint8_t green = 0;
+        uint8_t blue = 0;
+        // red -> green
+        // blue -> blue
+        // green -> red
+        if (hasMouse && !hasKeyboard) {
+                green = 1;
+        }else if (hasKeyboard && !hasMouse) {
+                red = 1;
+        }else if (hasKeyboard && hasMouse) {
+                red = 1;
+                green = 1;
+                blue = 1;
+        } else {
+                // all 0
+        }
         if (absolute_time_diff_us(last, now) > 500*1000) {
                 last = now;
+                printf("hasKeyboard = %d, hasMouse = %d, red = %d, green = %d, blue = %d\r\n", hasKeyboard, hasMouse, red, green, blue);
 
                 led_on ^= 1;
 #if PICO_ZERO
-                put_pixel_green(led_on); 
+                put_pixel_rgb(red, green, blue); 
 #else
                 gpio_put(GPIO_LED_PIN, led_on);
 #endif
@@ -329,7 +362,7 @@ static void     core1_main()
 
 int     main()
 {
-       set_sys_clock_khz(250*1000, true);
+        set_sys_clock_khz(250*1000, true);
 
 	stdio_init_all();
         io_init(); /* Just sets up the LED */
@@ -357,6 +390,14 @@ int     main()
                 tuh_task();
                 hid_app_task();
                 poll_led_etc();
+                
+                // // Add periodic hub status monitoring
+                // static uint32_t last_hub_check = 0;
+                // uint32_t now = to_ms_since_boot(get_absolute_time());
+                // if (now - last_hub_check > 5000) { // Check every 5 seconds
+                //         printf("USB Hub Status Check - Device count: %d\r\n", tuh_device_count());
+                //         last_hub_check = now;
+                // }
 	}
 
 	return 0;

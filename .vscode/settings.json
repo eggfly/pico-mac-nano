@@ -2,6 +2,7 @@
     "files.associations": {
         "pio_video.pio.h": "c",
         "font.h": "c",
-        "hw.h": "c"
+        "hw.h": "c",
+        "kbd.h": "c"
     }
 }

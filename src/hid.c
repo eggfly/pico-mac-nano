@@ -29,6 +29,8 @@
 
 #include "kbd.h"
 
+hid_info_t g_hid_info = {.count = 0};
+
 //--------------------------------------------------------------------+
 // MACRO TYPEDEF CONSTANT ENUM DECLARATION
 //--------------------------------------------------------------------+
@@ -57,6 +59,15 @@ void hid_app_task(void)
         // nothing to do
 }
 
+// store a array to store mount/umounted HID device info
+static struct {
+        uint8_t dev_addr;
+        uint8_t instance;
+        uint8_t const* desc_report;
+        uint16_t desc_len;
+} hid_device_info[CFG_TUH_HID];
+
+
 //--------------------------------------------------------------------+
 // TinyUSB Callbacks
 //--------------------------------------------------------------------+
@@ -68,13 +79,19 @@ void hid_app_task(void)
 // therefore report_desc = NULL, desc_len = 0
 void tuh_hid_mount_cb(uint8_t dev_addr, uint8_t instance, uint8_t const* desc_report, uint16_t desc_len)
 {
-        printf("HID device address = %d, instance = %d is mounted\r\n", dev_addr, instance);
-
         // Interface protocol (hid_interface_protocol_enum_t)
         const char* protocol_str[] = { "None", "Keyboard", "Mouse" };
         uint8_t const itf_protocol = tuh_hid_interface_protocol(dev_addr, instance);
+        // START MOD
+        g_hid_info.info[instance].hid_type = itf_protocol;
+        g_hid_info.count++;
+        // END MOD
 
-        printf("HID Interface Protocol = %s\r\n", protocol_str[itf_protocol]);
+        // printf("HID device address = %d, instance = %d is mounted\r\n", dev_addr, instance);
+        // printf("Report descriptor length = %d bytes\r\n", desc_len);
+
+        // printf("HID Interface Protocol = %s\r\n", protocol_str[itf_protocol]);
+        printf("[MOUNT] HID device address = %d, instance = %d is mounted, protocol = %s, descriptor length = %d bytes, count = %d\r\n", dev_addr, instance, protocol_str[itf_protocol], desc_len, g_hid_info.count);
 
         // By default host stack will use activate boot protocol on supported interface.
         // Therefore for this simple example, we only need to parse generic report descriptor (with built-in parser)
@@ -95,7 +112,24 @@ void tuh_hid_mount_cb(uint8_t dev_addr, uint8_t instance, uint8_t const* desc_re
 // Invoked when device with hid interface is un-mounted
 void tuh_hid_umount_cb(uint8_t dev_addr, uint8_t instance)
 {
-        printf("HID device address = %d, instance = %d is unmounted\r\n", dev_addr, instance);
+        // START MOD
+        g_hid_info.info[instance].hid_type = 0;
+        g_hid_info.count--;
+        // END MOD
+        uint8_t type = g_hid_info.info[instance].hid_type;
+        char * typeStr = "None";
+        switch (type) {
+                case 0:
+                typeStr = "None";
+                break;
+                case 1:
+                typeStr = "Keyboard";
+                break;
+                case 2:
+                typeStr = "Mouse";
+                break;
+        }
+        printf("[UNMOUNT]HID device address = %d, instance = %d is unmounted, type = %s, count = %d\r\n", dev_addr, instance, typeStr, g_hid_info.count);
 }
 
 // Invoked when received report from device via interrupt endpoint

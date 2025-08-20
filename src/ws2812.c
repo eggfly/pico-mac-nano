@@ -48,6 +48,13 @@ static inline void put_pixel(uint8_t r, uint8_t g, uint8_t b ) {
   pio_sm_put_blocking(pio1, 0, (urgb_u32(r, g, b) << 8u)); /* ws2812 takes 24 bit in order G R B. Shift 32bit value left 8 so data is in top 24 bits */
 }
 
+void put_pixel_rgb(uint8_t r, uint8_t g, uint8_t b) {
+        led_red = r;
+        led_green = g;
+        led_blue = b;
+        put_pixel(r, g, b);
+}
+
 void put_pixel_red(uint8_t val) {
         led_red = val;
         put_pixel(led_red, led_green, led_blue );

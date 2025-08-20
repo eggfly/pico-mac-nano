@@ -29,6 +29,17 @@
 
 #include <inttypes.h>
 #include <stdbool.h>
+#include "tusb_config.h"
+
+typedef struct {
+    uint8_t hid_type; // 0 is none, 1 is keyboard, 2 is mouse
+} hid_info_item_t;
+
+typedef struct {
+    hid_info_item_t info[CFG_TUH_HID];
+    uint8_t count;
+} hid_info_t;
+
 
 bool            kbd_queue_empty();
 /* If empty, return 0, else return a mac keycode in [7:0] and [15] set if a press (else release) */

@@ -32,5 +32,6 @@
 void put_pixel_red(uint8_t val);
 void put_pixel_green(uint8_t val);
 void put_pixel_blue(uint8_t val);
+void put_pixel_rgb(uint8_t r, uint8_t g, uint8_t b);
 
 #endif
