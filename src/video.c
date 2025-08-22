@@ -47,6 +47,9 @@
 #include "hw.h"
 #include "font.h"
 
+#define CUSTOM_TITLE_BAR 0
+
+
 // 内存监控函数
 static void print_memory_usage() {
     
@@ -260,7 +263,7 @@ static void video_prep_buffer()
 {
         // 初始化video_null数组
         memset(video_null, 0xff, sizeof(video_null));
-
+#if CUSTOM_TITLE_BAR
         // draw_string_8x8(video_null, 5, 10, "~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!~", 0);
         // draw_string_8x8(video_null, 5, 20, "Hello World! Pico Mac Nano Project!", 0);
         // draw_string_8x8(video_null, 5, 30, "--------- Macintosh System 1-6 since 1984 ---------", 0);
@@ -322,6 +325,7 @@ static void video_prep_buffer()
         // }
         draw_mac_icon(video_null, 0, 0);
         draw_string_8x8(video_null, 20, 80, "0123456789.9876543210", 0);
+#endif
         unsigned int porch_padding = (VIDEO_HRES - VIDEO_FB_HRES)/2;
         // FIXME: HBP/HFP are prob off by one or so, check
         uint32_t timing = ((VIDEO_HSW - 1) << 23) |

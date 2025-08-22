@@ -55,6 +55,9 @@ set(GPIO_AUDIO_INV 11 CACHE STRING "Inverse of audio signal out pin")
 # note: this must happen before project()
 include(pico_sdk_import.cmake)
 
+# Set Flash size to 4MB to accommodate larger firmware
+set(PICO_FLASH_SIZE_MB 4)
+
 project(firmware)
 
 # initialize the Raspberry Pi Pico SDK
