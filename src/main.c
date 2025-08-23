@@ -99,7 +99,7 @@ static void init_pwm_outputs()
         // 设置PWM频率为1kHz
         pwm_set_clkdiv(slice_num_6, 125.0f); // 125MHz / 125 = 1MHz
         pwm_set_wrap(slice_num_6, 9999); // 1MHz / 10000 = 100Hz，但可以设置更低占空比
-        pwm_set_chan_level(slice_num_6, chan_6, 1000); // 0.01%占空比 (1/10000)
+        pwm_set_chan_level(slice_num_6, chan_6, 9999); // 0.01%占空比 (1/10000)
         pwm_set_enabled(slice_num_6, true);
         
         printf("IO6 PWM initialized: 100Hz, 0.01%% duty cycle\n");
@@ -368,7 +368,7 @@ int     main()
         io_init(); /* Just sets up the LED */
         
         // 初始化PWM功能
-        // init_pwm_outputs();
+        init_pwm_outputs();
 
 #if BEEP
         printf("Output audio beep\n");
