@@ -90,7 +90,7 @@ set(UMAC_SOURCES
 set(MEMSIZE 128 CACHE STRING "Memory size, in KB")
 set(DISP_WIDTH 512 CACHE STRING "Display width in pixels, here must be 512!!!")
 set(DISP_HEIGHT 342 CACHE STRING "Display height in pixels")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -DPICO -DMUSASHI_CNF=\\\"../include/m68kconf.h\\\" -DUMAC_MEMSIZE=${MEMSIZE} -DDISP_WIDTH=${DISP_WIDTH} -DDISP_HEIGHT=${DISP_HEIGHT}")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -DPICO -DMUSASHI_CNF=\\\"../include/m68kconf.h\\\" -DUMAC_MEMSIZE=${MEMSIZE} -DDISP_WIDTH=${DISP_WIDTH} -DDISP_HEIGHT=${DISP_HEIGHT}")
 add_compile_definitions(USE_SD=1)
 
 if (USE_SD)

@@ -324,3 +324,52 @@ The remainder of the code is released under the MIT licence:
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
 
+
+# 关于 208K 和 480 分辨率的编译步骤
+
+* 首先必须 external/umac 带 `make MEMSIZE=208` 然后 ./main -W 从 4D1F8172 - MacPlus v3.ROM 生成 patched_rom
+* 然后 pico-mac 项目 cmake的时候 带上-DMEMSIZE=208 (256是不够的，RAM段恰好差了40多KB)
+* 生成的width 应该是512的（后续可以通过鼠标滚动处理？）
+* 208K可以通过Finder的白色背景的about固件看到
+* MacPaint 需要208K 且需要tf卡可读写 disc 模式才能运行，否则弹窗报错
+
+* 另，尝试使用`make DISP_WIDTH=480 DISP_HEIGHT=342 MEMSIZE=208` 打patched_rom以后，再到cmake 出来画面是错位的，然后需要在video.c 中修改#define VIDEO_FB_HRES           480 才可以，不知道为何
+* 从128K切换到208K以后，开机速度很慢，且流畅度确实有所降低
+* 改成480以后，左边出现了32像素的黑色边，右边超出屏幕了，video.c中还没有找到合适的改法
+* external/umac 会有.o 目标文件，在外面make的时候可能会用到缓存，所以在重新配置MEMSIZE等参数的时候，需要make clean一下umac
+
+# 128K 内存可以运行程序列表:
+* Alice 国际象棋
+* Aliens 小蜜蜂
+* Amazing 迷宫但是需要512宽度
+* MacLanding
+* Bricks 打砖块
+* ChipWits 黑屏
+* City Defense
+* Crystal Radar
+* Daleks 逃脱游戏
+* Destroyer
+* Frogger 崩溃了
+* Fusillade
+* GATO 不行
+* GridWars OK 3D效果不错
+* GroundZero OK
+* Hearts OK
+* Life OK
+* Missle Command OK
+* MLScores OK
+* Mouse
+* Reversi ok
+* Sargon III OK 国际象棋
+* Solitaire 1.0 OK
+* Transylvania 企鹅游戏不会玩
+* 汉诺塔 OK
+
+
+
+
+
+
+
+
+

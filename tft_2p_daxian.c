@@ -1,3 +1,5 @@
+// 大显 480x640 竖屏2.0寸 TFT 屏幕
+
 /* Functions to output to 2.0" 480x640 (Portrait) SPI & RBG565 TFT panel:
  *
  * Copyright 2025 Nick Gillard

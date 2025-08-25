@@ -1,6 +1,6 @@
 // 华迪 480x320 横屏 2.0寸 TFT 屏幕
 
-// /* Functions to output to 2.0" 480x640 (Portrait) SPI & RBG565 TFT panel:
+/* Functions to output to 2.0" 480x640 (Portrait) SPI & RBG565 TFT panel:
  *
  * Copyright 2025 Nick Gillard
  *
@@ -113,8 +113,8 @@ void tft_init() {
     gpio_put(TFT_RESET, 1);  // Set TFT Reset pin high
     sleep_ms(1);
 
-    tft_write_com(0xFF);    // Command2 BKx Selection
-    tft_write_dat(0x77);
+    tft_write_com(0xFF);    // Command2 BKx Selection - 12.3.1
+    tft_write_dat(0x77);    // 
     tft_write_dat(0x01);
     tft_write_dat(0x00);
     tft_write_dat(0x00);
@@ -123,29 +123,36 @@ void tft_init() {
     tft_write_com(0xEF);    // 
     tft_write_dat(0x08);
 
-    tft_write_com(0xFF);    // Command2 BKx Selection
+    tft_write_com(0xFF);    // Command2 BKx Selection - 12.3.1
     tft_write_dat(0x77);
     tft_write_dat(0x01);
     tft_write_dat(0x00);
     tft_write_dat(0x00);
     tft_write_dat(0x10);
 
-    tft_write_com(0xC0);    // LNESET: Display Line Setting
+    tft_write_com(0xC0);    // Command 2 BK0: LNESET (C0h/C000h): Display Line Setting - 12.3.2.7
     tft_write_dat(0x2C);
     tft_write_dat(0x00);
 
-    tft_write_com(0xC1);    // PORCTRL: Porch Control
-    tft_write_dat(0x0D);
-    tft_write_dat(0x02);
+    tft_write_com(0xC1);    // Command 2 BK0: PORCTRL (C1h/C100h):Porch Control - 12.3.2.8
+    tft_write_dat(0x0D);    // VBP[7:0]: Back-Porch Vertical line setting for display.
+    tft_write_dat(0x02);    // VFP[7:0]: Front-Porch Vertical line setting for display.
 
-    tft_write_com(0xC2);    // INVSET: Inversion selection & Frame Rate Control
+    tft_write_com(0xC2);    // Command 2 BK0: INVSET (C2h/C200h):Inversion selection & Frame Rate Control - 12.3.2.9
     tft_write_dat(0x31);
     tft_write_dat(0x05);
+
+    // IMPORTANT FOR LATCHING DATA, OR WILL BE RANDOM COLOR LINES
+    tft_write_com(0xC3);    // Command 2 BK0: RGBCTRL (C3h/C300h):RGB control - 12.3.2.10
+    tft_write_dat(0x83);    // DE/HV - - - VSP HSP DP EP : VS Polarity, HS Pol, Dot/pixel Clk Pol, Enable Pin Pol. 0x83 = 10000011 VS & HS active when low, DP input on falling edge, EP Data written when enable is 0.
+    tft_write_dat(0x33);    // HBP_HVRGB[7:0]. 0x33 = 51
+    tft_write_dat(0x1b);    // VBP_HVRGB[7:0]. 0x1b = 27
+
 
     tft_write_com(0xCC);    // 
     tft_write_dat(0x10);
 
-    tft_write_com(0xB0);    // PVGAMCTRL: Positive Voltage Gamma Control
+    tft_write_com(0xB0);    // Command 2 BK0: PVGAMCTRL (B0h/B000h): Positive Voltage Gamma Control - 12.3.2.1
     tft_write_dat(0x0A);
     tft_write_dat(0x14);
     tft_write_dat(0x1B);
@@ -181,7 +188,7 @@ void tft_init() {
     tft_write_dat(0x31);
     tft_write_dat(0x1B);
 
-    tft_write_com(0xFF);    // Command2 BKx Selection
+    tft_write_com(0xFF);    // Command2 BKx Selection - 12.3.1
     tft_write_dat(0x77);
     tft_write_dat(0x01);
     tft_write_dat(0x00);
@@ -197,31 +204,31 @@ void tft_init() {
     tft_write_com(0xB2);    // VGHSS: VGH Voltage setting
     tft_write_dat(0x87);
 
-    tft_write_com(0xB3);    // TESTCMD: TEST Command Setting
+    tft_write_com(0xB3);    // TESTCMD (B3h/B300h):TEST Command Setting - 12.3.3.4
     tft_write_dat(0x80);
 
-    tft_write_com(0xB5);    // VGLS: VGL Voltage setting
+    tft_write_com(0xB5);    // VGLS (B5h/B500h):VGL Voltage setting - 12.3.3.5
     tft_write_dat(0x47);
 
-    tft_write_com(0xB7);    // PWCTRL1: Power Control 1
+    tft_write_com(0xB7);    // PWCTRL1 (B7h/B700h):Power Control 1 - 12.3.3.6
     tft_write_dat(0x85);
 
-    tft_write_com(0xB8);    // DGMEN: Digital Gamma Enable
+    tft_write_com(0xB8);    // Command 2 BK0: DGMEN (B8h/B800h): Digital Gamma Enable - 12.3.2.3
     tft_write_dat(0x21);
 
-    tft_write_com(0xC1);    // PORCTRL: Porch Control
+    tft_write_com(0xC1);    // Command 2 BK0: PORCTRL (C1h/C100h):Porch Control - 12.3.2.8
     tft_write_dat(0x78);
 
-    tft_write_com(0xC2);    // INVSET: Inversion selection & Frame Rate Control
+    tft_write_com(0xC2);    // Command 2 BK0: INVSET (C2h/C200h):Inversion selection & Frame Rate Control - 12.3.2.9
     tft_write_dat(0x78);
 
-    tft_write_com(0xD0);    // MIPISET1: MIPI Setting 1
+    tft_write_com(0xD0);    // MIPISET1 (D0h/D000h):MIPI Setting 1 - 12.3.3.14
     tft_write_dat(0x88);
 
-    tft_write_com(0xE0);    // SECTRL: Sunlight Readable Enhancement
+    tft_write_com(0xE0);    // SECTRL (E0h/E000h):Sunlight Readable Enhancement - 12.3.2.16
     tft_write_dat(0x00);
 
-    tft_write_com(0x1B);    // 
+    tft_write_com(0x1B);    //
     tft_write_dat(0x02);
 
     tft_write_com(0xE1);    // NRCTRL: Noise Reduce Control
@@ -346,7 +353,7 @@ void tft_init() {
     tft_write_dat(0x3F);
     tft_write_dat(0x54);
 
-    tft_write_com(0xFF);    // Command2 BKx Selection
+    tft_write_com(0xFF);    // Command2 BKx Selection - 12.3.1
     tft_write_dat(0x77);
     tft_write_dat(0x01);
     tft_write_dat(0x00);
@@ -365,22 +372,22 @@ void tft_init() {
     tft_write_dat(0x00);
     tft_write_dat(0x00);
 
-    tft_write_com(0xFF);    // Command2 BKx Selection
+    tft_write_com(0xFF);    // Command2 BKx Selection - 12.3.1
     tft_write_dat(0x77);
     tft_write_dat(0x01);
     tft_write_dat(0x00);
     tft_write_dat(0x00);
     tft_write_dat(0x00);
 
-    tft_write_com(0x3A);    // COLMOD: Interface Pixel Format
-    tft_write_dat(0x55);    // RGB565
+    tft_write_com(0x3A);    // COLMOD (3Ah/3A00h): Interface Pixel Format - 12.2.30
+    tft_write_dat(0x55);    // 0x55   RGB565   //0x77  RGB888
 
     tft_write_com(0x36);    // MADCTL: Memory Access Control
     tft_write_dat(0x48);
 
     tft_write_com(0x11);    // SLPOUT: Sleep Out
     sleep_ms(120);
-    tft_write_com(0x29);    // DISPON: Display On
+    tft_write_com(0x29);    // DISPON (29h/2900h): Display On - 12.2.24
     tft_write_com(0x35);    // TEON: Tearing Effect Line On
     tft_write_dat(0x00);
  //   sleep_ms(120);

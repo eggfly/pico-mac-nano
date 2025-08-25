@@ -125,7 +125,7 @@ void draw_mac_icon(uint32_t *framebuffer, int start_x, int start_y) {
  * make my VGA-HDMI adapter sample weird, and pixels crawl.  Fudge a little,
  * looks better:
  */
-#define VIDEO_PCLK_MULT         (10) /* Was (2.5*2) */
+#define VIDEO_PCLK_MULT         (4) /* Was (2.5*2) */
 #define VIDEO_HSW               2  /* Was 96 */
 #define VIDEO_HBP               63  /* Horizontal Back Porch */
 #define VIDEO_HRES              480 /* Hor Resolution. changed from 640 */
@@ -262,7 +262,8 @@ static void     __not_in_flash_func(video_dma_irq)()
 static void video_prep_buffer()
 {
         // 初始化video_null数组
-        memset(video_null, 0b00001111, sizeof(video_null));
+        // memset(video_null, 0b00001111, sizeof(video_null));
+        memset(video_null, 0xff, sizeof(video_null)); // all black
 #if CUSTOM_TITLE_BAR
         // draw_string_8x8(video_null, 5, 10, "~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!~!~", 0);
         // draw_string_8x8(video_null, 5, 20, "Hello World! Pico Mac Nano Project!", 0);
